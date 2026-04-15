@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>AI-901 Runner · Enhanced</title>
+<meta name="apple-mobile-web-app-status-bar-style" "black-translucent">
+<title>AI-901 Runner</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -77,8 +77,13 @@ html,body{width:100%;height:100%;overflow:hidden;
 #vignette{position:absolute;inset:0;pointer-events:none;z-index:90;
   background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(0,0,0,.5) 100%)}
 
-/* canvas starfield – smoother than CSS gradients */
-#starCanvas{position:absolute;inset:0;pointer-events:none;z-index:1}
+#starsFar,#starsNear,#starsBright{position:absolute;inset:0;pointer-events:none;
+  background-repeat:repeat;background-size:100% 100%}
+#starsFar{animation:starDrift 40s linear infinite;opacity:.6}
+#starsNear{animation:starDrift 22s linear infinite}
+#starsBright{animation:starTwinkle 4s ease-in-out infinite alternate}
+@keyframes starDrift{from{background-position:0 0}to{background-position:0 100%}}
+@keyframes starTwinkle{0%{opacity:.3}100%{opacity:.9}}
 
 #nebula{position:absolute;inset:0;pointer-events:none;
   background:
@@ -96,7 +101,7 @@ html,body{width:100%;height:100%;overflow:hidden;
 .lane-line{position:absolute;top:8%;bottom:0;width:1px;
   background:repeating-linear-gradient(180deg,
     rgba(0,229,255,.04) 0px,rgba(0,229,255,.15) 8px,rgba(0,229,255,.04) 16px);
-  animation:laneScroll .8s linear infinite}
+  animation:laneScroll 1.2s linear infinite}
 .lane-line::before{content:'';position:absolute;top:0;bottom:0;left:-3px;width:7px;
   background:inherit;filter:blur(4px);opacity:.35}
 @keyframes laneScroll{from{background-position:0 0}to{background-position:0 16px}}
@@ -105,9 +110,8 @@ html,body{width:100%;height:100%;overflow:hidden;
 #spaceGlow{position:absolute;left:0;right:0;bottom:0;height:18%;pointer-events:none;
   background:linear-gradient(0deg,rgba(0,80,180,.08),transparent)}
 
-/* player */
 #player{position:absolute;bottom:5%;width:16em;
-  will-change:left;transition:left .09s cubic-bezier(.2,.9,.3,1);
+  will-change:left;transition:left .1s cubic-bezier(.2,.9,.3,1);
   animation:spaceHover 2.8s ease-in-out infinite;z-index:50;
   filter:drop-shadow(0 0 4em rgba(0,229,255,.35))}
 #player.inv::after{content:'';position:absolute;inset:-3em;border-radius:50%;
@@ -115,29 +119,58 @@ html,body{width:100%;height:100%;overflow:hidden;
 @keyframes invBlink{0%,100%{opacity:0}50%{opacity:.8}}
 @keyframes spaceHover{0%,100%{transform:translateY(0) rotate(-.3deg)}50%{transform:translateY(-1.5em) rotate(.3deg)}}
 
-/* astronaut assembly (unchanged) */
-.jp-assembly{position:absolute;top:3em;left:-1.4em;right:-1.4em;height:10em;z-index:0;display:flex;justify-content:space-between}
+.jp-assembly{position:absolute;top:3em;left:-1.4em;right:-1.4em;height:10em;z-index:0;
+  display:flex;justify-content:space-between}
 .jp-unit{width:2.8em;position:relative}
-.jp-tank{width:100%;height:100%;background:linear-gradient(90deg,#505068,#70708a 30%,#8888a0 50%,#70708a 70%,#505068);border-radius:1.4em;box-shadow:inset 0 0 1em rgba(0,0,0,.3),0 0 .5em rgba(0,180,216,.15)}
-.jp-tank::before{content:'';position:absolute;top:-.8em;left:.4em;right:.4em;height:1.2em;background:linear-gradient(180deg,#999,#bbb,#888);border-radius:.6em .6em 0 0;box-shadow:0 -.2em .3em rgba(255,255,255,.1)}
-.jp-tank::after{content:'';position:absolute;bottom:-.5em;left:.6em;right:.6em;height:.8em;background:linear-gradient(180deg,#444,#666);border-radius:0 0 1em 1em}
-.jp-band{position:absolute;left:0;right:0;height:.35em;background:linear-gradient(90deg,rgba(0,180,216,.3),rgba(0,229,255,.5),rgba(0,180,216,.3))}
+.jp-tank{width:100%;height:100%;
+  background:linear-gradient(90deg,#505068,#70708a 30%,#8888a0 50%,#70708a 70%,#505068);
+  border-radius:1.4em;
+  box-shadow:inset 0 0 1em rgba(0,0,0,.3),0 0 .5em rgba(0,180,216,.15)}
+.jp-tank::before{content:'';position:absolute;top:-.8em;left:.4em;right:.4em;height:1.2em;
+  background:linear-gradient(180deg,#999,#bbb,#888);border-radius:.6em .6em 0 0;
+  box-shadow:0 -.2em .3em rgba(255,255,255,.1)}
+.jp-tank::after{content:'';position:absolute;bottom:-.5em;left:.6em;right:.6em;height:.8em;
+  background:linear-gradient(180deg,#444,#666);border-radius:0 0 1em 1em}
+.jp-band{position:absolute;left:0;right:0;height:.35em;
+  background:linear-gradient(90deg,rgba(0,180,216,.3),rgba(0,229,255,.5),rgba(0,180,216,.3))}
 .jp-band-1{top:25%}.jp-band-2{top:55%}.jp-band-3{top:80%}
-.jp-connector{position:absolute;top:-.5em;left:50%;transform:translateX(-50%);width:1.2em;height:1em;background:#606078;border-radius:.3em;box-shadow:0 0 .3em rgba(0,180,216,.2)}
+.jp-connector{position:absolute;top:-.5em;left:50%;transform:translateX(-50%);
+  width:1.2em;height:1em;background:#606078;border-radius:.3em;
+  box-shadow:0 0 .3em rgba(0,180,216,.2)}
 .jp-flame-wrap{position:absolute;bottom:-1.2em;left:50%;transform:translateX(-50%);display:flex;gap:.2em}
 .jp-flame{border-radius:0 0 50% 50%;filter:blur(1px)}
-.jp-flame-outer{width:2.2em;height:6em;background:linear-gradient(180deg,rgba(0,180,255,.4),rgba(0,80,200,.15),transparent);animation:flameOuter .1s ease-in-out infinite alternate}
-.jp-flame-mid{width:1.6em;height:5em;margin-top:-.5em;background:linear-gradient(180deg,rgba(0,229,255,.7),rgba(0,150,255,.3),transparent);animation:flameMid .08s ease-in-out infinite alternate}
-.jp-flame-core{width:.8em;height:3.5em;margin-top:-.3em;background:linear-gradient(180deg,rgba(200,240,255,.9),rgba(0,229,255,.5),transparent);animation:flameCore .06s ease-in-out infinite alternate}
+.jp-flame-outer{width:2.2em;height:6em;
+  background:linear-gradient(180deg,rgba(0,180,255,.4),rgba(0,80,200,.15),transparent);
+  animation:flameOuter .1s ease-in-out infinite alternate}
+.jp-flame-mid{width:1.6em;height:5em;margin-top:-.5em;
+  background:linear-gradient(180deg,rgba(0,229,255,.7),rgba(0,150,255,.3),transparent);
+  animation:flameMid .08s ease-in-out infinite alternate}
+.jp-flame-core{width:.8em;height:3.5em;margin-top:-.3em;
+  background:linear-gradient(180deg,rgba(200,240,255,.9),rgba(0,229,255,.5),transparent);
+  animation:flameCore .06s ease-in-out infinite alternate}
 @keyframes flameOuter{0%{height:5em;opacity:.5}100%{height:7em;opacity:.8}}
 @keyframes flameMid{0%{height:4em;opacity:.6}100%{height:6em;opacity:1}}
 @keyframes flameCore{0%{height:3em;opacity:.7}100%{height:4.5em;opacity:1}}
-.helmet{width:12em;height:10.5em;margin:0 auto .3em;background:linear-gradient(160deg,#f4f4fa 0%,#d8d8e4 40%,#c0c0d0 100%);border-radius:50% 50% 44% 44%;position:relative;z-index:2;box-shadow:0 .4em 1.2em rgba(0,0,0,.35),0 0 .5em rgba(200,210,230,.15),inset 0 -.5em 1em rgba(0,0,0,.1)}
-.helmet::before{content:'';position:absolute;top:.5em;left:2em;right:2em;height:.7em;background:linear-gradient(90deg,transparent 10%,rgba(255,255,255,.5) 40%,rgba(255,255,255,.5) 60%,transparent 90%);border-radius:50%}
-.helmet::after{content:'';position:absolute;top:1em;bottom:2em;left:.5em;width:1em;background:linear-gradient(90deg,rgba(0,0,0,.08),transparent);border-radius:50%}
-.visor{position:absolute;top:1.8em;left:2em;right:2em;bottom:1.2em;background:linear-gradient(170deg,#00d4f8 0%,#0099cc 30%,#006d99 60%,#004d73 100%);border-radius:42% 42% 46% 46%;box-shadow:0 0 4em rgba(0,180,216,.6),0 0 8em rgba(0,140,200,.25),inset 0 0 3em rgba(0,229,255,.2),inset 0 -.8em 1.5em rgba(0,0,0,.25);overflow:hidden}
-.visor::before{content:'';position:absolute;top:12%;left:8%;width:35%;height:25%;background:linear-gradient(165deg,rgba(255,255,255,.2),rgba(255,255,255,.05) 60%,transparent);border-radius:50%;transform:rotate(-10deg)}
-.visor::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.4),transparent)}
+
+.helmet{width:12em;height:10.5em;margin:0 auto .3em;
+  background:linear-gradient(160deg,#f4f4fa 0%,#d8d8e4 40%,#c0c0d0 100%);
+  border-radius:50% 50% 44% 44%;position:relative;z-index:2;
+  box-shadow:0 .4em 1.2em rgba(0,0,0,.35),0 0 .5em rgba(200,210,230,.15),inset 0 -.5em 1em rgba(0,0,0,.1)}
+.helmet::before{content:'';position:absolute;top:.5em;left:2em;right:2em;height:.7em;
+  background:linear-gradient(90deg,transparent 10%,rgba(255,255,255,.5) 40%,rgba(255,255,255,.5) 60%,transparent 90%);
+  border-radius:50%}
+.helmet::after{content:'';position:absolute;top:1em;bottom:2em;left:.5em;width:1em;
+  background:linear-gradient(90deg,rgba(0,0,0,.08),transparent);border-radius:50%}
+.visor{position:absolute;top:1.8em;left:2em;right:2em;bottom:1.2em;
+  background:linear-gradient(170deg,#00d4f8 0%,#0099cc 30%,#006d99 60%,#004d73 100%);
+  border-radius:42% 42% 46% 46%;
+  box-shadow:0 0 4em rgba(0,180,216,.6),0 0 8em rgba(0,140,200,.25),
+  inset 0 0 3em rgba(0,229,255,.2),inset 0 -.8em 1.5em rgba(0,0,0,.25);overflow:hidden}
+.visor::before{content:'';position:absolute;top:12%;left:8%;width:35%;height:25%;
+  background:linear-gradient(165deg,rgba(255,255,255,.2),rgba(255,255,255,.05) 60%,transparent);
+  border-radius:50%;transform:rotate(-10deg)}
+.visor::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(0,229,255,.4),transparent)}
 .holo{position:absolute;text-shadow:0 0 4px rgba(0,229,255,.8);pointer-events:none}
 .holo-1{top:18%;left:15%;font-size:2.2em;color:rgba(255,255,255,.5);animation:holoA 3.5s ease-in-out infinite}
 .holo-2{top:55%;left:55%;font-size:1.4em;color:rgba(0,229,255,.6);animation:holoB 4s ease-in-out infinite}
@@ -147,88 +180,142 @@ html,body{width:100%;height:100%;overflow:hidden;
 @keyframes holoA{0%,100%{transform:translateY(0);opacity:.3}50%{transform:translateY(-.8em);opacity:.85}}
 @keyframes holoB{0%,100%{transform:translateY(0) translateX(0);opacity:.25}50%{transform:translateY(-.6em) translateX(.3em);opacity:.75}}
 @keyframes holoC{0%,100%{transform:translateY(0) scale(1);opacity:.35}50%{transform:translateY(-.5em) scale(1.1);opacity:.8}}
-.suit-body{width:13em;height:9.5em;margin:0 auto;background:linear-gradient(175deg,#f2f2f8 0%,#e0e0ea 25%,#d0d0dc 60%,#c5c5d4 100%);border-radius:24% 24% 16% 16%;position:relative;z-index:2;border:.35em solid rgba(0,180,216,.2);box-shadow:0 0 2.5em rgba(0,180,216,.12),inset 0 .5em 1em rgba(0,0,0,.05)}
-.suit-body::before{content:'';position:absolute;top:0;left:0;right:0;height:.5em;background:linear-gradient(90deg,transparent 5%,var(--cyan) 30%,var(--cyan2) 50%,var(--cyan) 70%,transparent 95%);box-shadow:0 0 6px var(--cyan),0 0 12px rgba(0,229,255,.3)}
-.suit-body::after{content:'';position:absolute;top:.8em;bottom:.8em;left:50%;width:.25em;transform:translateX(-50%);background:linear-gradient(180deg,rgba(0,180,216,.08),rgba(0,180,216,.2),rgba(0,180,216,.08))}
+
+.suit-body{width:13em;height:9.5em;margin:0 auto;
+  background:linear-gradient(175deg,#f2f2f8 0%,#e0e0ea 25%,#d0d0dc 60%,#c5c5d4 100%);
+  border-radius:24% 24% 16% 16%;position:relative;z-index:2;
+  border:.35em solid rgba(0,180,216,.2);
+  box-shadow:0 0 2.5em rgba(0,180,216,.12),inset 0 .5em 1em rgba(0,0,0,.05)}
+.suit-body::before{content:'';position:absolute;top:0;left:0;right:0;height:.5em;
+  background:linear-gradient(90deg,transparent 5%,var(--cyan) 30%,var(--cyan2) 50%,var(--cyan) 70%,transparent 95%);
+  box-shadow:0 0 6px var(--cyan),0 0 12px rgba(0,229,255,.3)}
+.suit-body::after{content:'';position:absolute;top:.8em;bottom:.8em;left:50%;width:.25em;
+  transform:translateX(-50%);background:linear-gradient(180deg,rgba(0,180,216,.08),rgba(0,180,216,.2),rgba(0,180,216,.08))}
 .suit-panel-l,.suit-panel-r{position:absolute;top:1.5em;bottom:1.5em;width:.2em;background:rgba(0,180,216,.1)}
 .suit-panel-l{left:18%}.suit-panel-r{right:18%}
-.chest-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:4.5em;line-height:1;color:var(--cyan);text-shadow:0 0 10px var(--cyan),0 0 20px rgba(0,229,255,.3),0 0 40px rgba(0,229,255,.15);font-weight:900}
-.suit-belt{position:absolute;bottom:1.2em;left:10%;right:10%;height:1.2em;background:linear-gradient(180deg,#a0a0b0,#888898);border-radius:.4em;box-shadow:0 .2em .3em rgba(0,0,0,.2)}
-.suit-belt::after{content:'';position:absolute;top:.25em;left:50%;transform:translateX(-50%);width:1.5em;height:.7em;background:rgba(0,229,255,.3);border-radius:.2em;box-shadow:0 0 4px rgba(0,229,255,.4)}
+.chest-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-size:4.5em;line-height:1;color:var(--cyan);
+  text-shadow:0 0 10px var(--cyan),0 0 20px rgba(0,229,255,.3),0 0 40px rgba(0,229,255,.15);font-weight:900}
+.suit-belt{position:absolute;bottom:1.2em;left:10%;right:10%;height:1.2em;
+  background:linear-gradient(180deg,#a0a0b0,#888898);border-radius:.4em;
+  box-shadow:0 .2em .3em rgba(0,0,0,.2)}
+.suit-belt::after{content:'';position:absolute;top:.25em;left:50%;transform:translateX(-50%);
+  width:1.5em;height:.7em;background:rgba(0,229,255,.3);border-radius:.2em;
+  box-shadow:0 0 4px rgba(0,229,255,.4)}
 .suit-legs{display:flex;justify-content:center;gap:2em;margin-top:.4em;position:relative;z-index:2}
-.leg{width:3.6em;height:5.5em;background:linear-gradient(180deg,#d5d5e0,#c0c0cc 50%,#b5b5c5);border-radius:1.8em 1.8em 1.2em 1.2em;border:.3em solid rgba(0,180,216,.15);border-top:none;position:relative}
-.leg::before{content:'';position:absolute;top:35%;left:.2em;right:.2em;height:1.2em;background:linear-gradient(180deg,#c8c8d4,#b0b0c0);border-radius:.8em;border:.15em solid rgba(0,180,216,.1)}
-.leg::after{content:'';position:absolute;bottom:0;left:-.1em;right:-.1em;height:1.4em;background:linear-gradient(180deg,#888898,#6a6a7a);border-radius:0 0 1.4em 1.4em;box-shadow:0 .2em .4em rgba(0,0,0,.3)}
+.leg{width:3.6em;height:5.5em;
+  background:linear-gradient(180deg,#d5d5e0,#c0c0cc 50%,#b5b5c5);
+  border-radius:1.8em 1.8em 1.2em 1.2em;
+  border:.3em solid rgba(0,180,216,.15);border-top:none;position:relative}
+.leg::before{content:'';position:absolute;top:35%;left:.2em;right:.2em;height:1.2em;
+  background:linear-gradient(180deg,#c8c8d4,#b0b0c0);border-radius:.8em;
+  border:.15em solid rgba(0,180,216,.1)}
+.leg::after{content:'';position:absolute;bottom:0;left:-.1em;right:-.1em;height:1.4em;
+  background:linear-gradient(180deg,#888898,#6a6a7a);border-radius:0 0 1.4em 1.4em;
+  box-shadow:0 .2em .4em rgba(0,0,0,.3)}
 
-/* obstacles */
 .obs{position:absolute;top:0;width:11em;height:11em;will-change:transform;pointer-events:none}
-.obs::before{content:'';position:absolute;inset:15%;border-radius:inherit;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.15),transparent 60%);opacity:.6}
-.obs::after{content:'';position:absolute;inset:30%;background:radial-gradient(circle,rgba(0,0,0,.2),transparent 70%)}
+.obs::before{content:'';position:absolute;inset:15%;border-radius:inherit;
+  background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.15),transparent 60%);opacity:.6}
+.obs::after{content:'';position:absolute;inset:30%;
+  background:radial-gradient(circle,rgba(0,0,0,.2),transparent 70%)}
 
-/* HUD */
 #hud{position:absolute;top:0;left:0;right:0;padding:2.5em 4em 1.5em;z-index:100;pointer-events:none}
 .hud-row1{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2em}
 #scoreLbl{font-size:2em;color:rgba(0,229,255,.4);letter-spacing:1em;text-transform:uppercase;margin-bottom:.3em}
-#scoreVal{font-size:8em;font-weight:900;color:var(--cyan);line-height:1;text-shadow:0 0 3em var(--cyan),0 0 8em rgba(0,229,255,.35);font-variant-numeric:tabular-nums}
+#scoreVal{font-size:8em;font-weight:900;color:var(--cyan);line-height:1;
+  text-shadow:0 0 3em var(--cyan),0 0 8em rgba(0,229,255,.35);font-variant-numeric:tabular-nums}
 #livesRow{display:flex;gap:1em;align-items:center;padding-top:.3em}
 .lheart{font-size:5.5em;transition:all .3s;filter:drop-shadow(0 0 2px rgba(255,50,100,.8))}
 .lheart.gone{filter:grayscale(1) opacity(.15);transform:scale(.75)}
 #quizBar{height:2px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
-#quizFill{height:100%;width:100%;border-radius:2px;background:linear-gradient(90deg,var(--cyan),var(--purple));transform-origin:left}
-#quizHint{font-size:2.2em;color:rgba(0,229,255,.5);letter-spacing:.8em;text-transform:uppercase;text-align:center;margin-top:1.5em;opacity:0;transition:opacity .5s}
+#quizFill{height:100%;width:100%;border-radius:2px;
+  background:linear-gradient(90deg,var(--cyan),var(--purple));transform-origin:left}
+#quizHint{font-size:2.2em;color:rgba(0,229,255,.5);letter-spacing:.8em;text-transform:uppercase;
+  text-align:center;margin-top:1.5em;opacity:0;transition:opacity .5s}
 #quizHint.vis{opacity:1;animation:hintAnim 1s ease-in-out infinite}
 @keyframes hintAnim{0%,100%{opacity:.4}50%{opacity:1}}
-#speedBadge{position:absolute;bottom:4%;right:4%;font-size:2.8em;font-weight:700;color:rgba(0,229,255,.25);pointer-events:none;letter-spacing:.3em}
+#speedBadge{position:absolute;bottom:4%;right:4%;font-size:2.8em;font-weight:700;
+  color:rgba(0,229,255,.25);pointer-events:none;letter-spacing:.3em}
 
 #hitFlash{position:fixed;inset:0;z-index:4000;background:rgba(255,0,80,.35);opacity:0;pointer-events:none;transition:opacity .08s}
 #gainFlash{position:fixed;inset:0;z-index:4000;background:rgba(0,255,100,.2);opacity:0;pointer-events:none;transition:opacity .08s}
 .part{position:absolute;border-radius:50%;pointer-events:none;animation:partFly .5s ease-out forwards;z-index:200}
 @keyframes partFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(.1)}}
-#comboText{position:absolute;top:28%;left:50%;transform:translateX(-50%);font-size:5.5em;font-weight:900;color:var(--yellow);text-shadow:0 0 4em var(--yellow);pointer-events:none;opacity:0;letter-spacing:.5em;z-index:150}
-#swipeHint{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);font-size:2.8em;color:rgba(0,229,255,.25);letter-spacing:.5em;pointer-events:none;text-transform:uppercase;animation:hintFade 3s ease-out 1.5s forwards;opacity:0;white-space:nowrap}
+#comboText{position:absolute;top:28%;left:50%;transform:translateX(-50%);font-size:5.5em;font-weight:900;
+  color:var(--yellow);text-shadow:0 0 4em var(--yellow);pointer-events:none;opacity:0;letter-spacing:.5em;z-index:150}
+#swipeHint{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);font-size:2.8em;
+  color:rgba(0,229,255,.25);letter-spacing:.5em;pointer-events:none;text-transform:uppercase;
+  animation:hintFade 3s ease-out 1.5s forwards;opacity:0;white-space:nowrap}
 @keyframes hintFade{0%{opacity:0}5%{opacity:1}80%{opacity:.4}100%{opacity:0}}
 
-/* quiz overlay */
-#quizOverlay{position:fixed;inset:0;z-index:3000;background:rgba(2,6,16,.97);backdrop-filter:blur(10px);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto;gap:0;font-size:16px;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+#quizOverlay{position:fixed;inset:0;z-index:3000;background:rgba(2,6,16,.97);
+  backdrop-filter:blur(10px);display:none;flex-direction:column;align-items:center;
+  justify-content:center;padding:24px;overflow-y:auto;gap:0;font-size:16px;
+  touch-action:pan-y;-webkit-overflow-scrolling:touch}
 #quizOverlay.show{display:flex}
 .qo-top{text-align:center;padding:0 0 16px;flex-shrink:0;max-width:560px;width:100%}
-.qo-badge{display:inline-block;font-size:clamp(10px,2.5vw,14px);letter-spacing:8px;color:var(--cyan);text-transform:uppercase;border:1px solid rgba(0,229,255,.25);border-radius:20px;padding:6px 20px;margin-bottom:12px;background:rgba(0,229,255,.04)}
+.qo-badge{display:inline-block;font-size:clamp(10px,2.5vw,14px);letter-spacing:8px;color:var(--cyan);
+  text-transform:uppercase;border:1px solid rgba(0,229,255,.25);border-radius:20px;
+  padding:6px 20px;margin-bottom:12px;background:rgba(0,229,255,.04)}
 .qo-title{font-size:clamp(16px,3.8vw,22px);color:#7dd3fc;font-weight:700;margin-bottom:8px}
 .qo-reward{font-size:clamp(12px,3vw,16px);color:var(--green);text-shadow:0 0 8px rgba(34,197,94,.5)}
-#qDomain{display:inline-block;font-size:clamp(10px,2.3vw,13px);letter-spacing:4px;color:rgba(168,85,247,.8);text-transform:uppercase;margin-bottom:12px}
-#qText{font-size:clamp(14px,4.3vw,18px);color:#e2e8f0;line-height:1.6;text-align:center;padding:16px 20px;margin:0 auto 16px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);border-radius:14px;max-width:560px;width:100%;flex-shrink:0}
+#qDomain{display:inline-block;font-size:clamp(10px,2.3vw,13px);letter-spacing:4px;
+  color:rgba(168,85,247,.8);text-transform:uppercase;margin-bottom:12px}
+#qText{font-size:clamp(14px,4.3vw,18px);color:#e2e8f0;line-height:1.6;text-align:center;
+  padding:16px 20px;margin:0 auto 16px;background:rgba(0,229,255,.03);
+  border:1px solid rgba(0,229,255,.1);border-radius:14px;max-width:560px;width:100%;flex-shrink:0}
 #qOpts{display:flex;flex-direction:column;gap:10px;width:100%;max-width:560px;flex-shrink:0}
-.qopt{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:rgba(255,255,255,.035);border:1.5px solid rgba(255,255,255,.09);border-radius:11px;cursor:pointer;font-size:clamp(13px,3.5vw,16px);color:#cbd5e1;line-height:1.5;transition:all .15s;text-align:left;touch-action:none}
+.qopt{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;
+  background:rgba(255,255,255,.035);border:1.5px solid rgba(255,255,255,.09);
+  border-radius:11px;cursor:pointer;font-size:clamp(13px,3.5vw,16px);color:#cbd5e1;
+  line-height:1.5;transition:all .15s;text-align:left;touch-action:none}
 .qopt:active{transform:scale(.98)}
 .qopt.dis{pointer-events:none}
 .qopt.hit-ok{border-color:var(--green);background:rgba(34,197,94,.08);color:#4ade80}
 .qopt.hit-bad{border-color:#dc2626;background:rgba(220,38,38,.08);color:#f87171}
 .qopt.reveal-ok{border-color:var(--green);background:rgba(34,197,94,.05);color:#4ade80}
-.qltr{width:32px;height:32px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:rgba(148,163,184,.7)}
+.qltr{width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:rgba(148,163,184,.7)}
 .qopt.hit-ok .qltr{background:var(--green);border-color:var(--green);color:#fff}
 .qopt.hit-bad .qltr{background:#dc2626;border-color:#dc2626;color:#fff}
 .qopt.reveal-ok .qltr{background:var(--green);border-color:var(--green);color:#fff}
-#qExpl{margin:12px auto 0;padding:14px 16px;background:rgba(0,229,255,.04);border-left:3px solid var(--cyan);border-radius:0 10px 10px 0;font-size:clamp(12px,3.3vw,15px);color:#94a3b8;line-height:1.65;max-width:560px;width:100%;display:none;flex-shrink:0;border:1px solid rgba(0,229,255,.1);border-left:3px solid var(--cyan)}
+#qExpl{margin:12px auto 0;padding:14px 16px;background:rgba(0,229,255,.04);
+  border-left:3px solid var(--cyan);border-radius:0 10px 10px 0;
+  font-size:clamp(12px,3.3vw,15px);color:#94a3b8;line-height:1.65;
+  max-width:560px;width:100%;display:none;flex-shrink:0;
+  border:1px solid rgba(0,229,255,.1);border-left:3px solid var(--cyan)}
 #qExpl.show{display:block}
 #qExpl strong{color:var(--cyan);display:block;margin-bottom:6px;font-size:clamp(11px,2.8vw,13px);letter-spacing:2px;text-transform:uppercase}
-#qContinue{margin:16px auto;padding:14px 32px;background:transparent;border:1.5px solid rgba(0,229,255,.35);border-radius:11px;color:var(--cyan);font-size:clamp(14px,3.8vw,18px);font-weight:700;cursor:pointer;display:none;letter-spacing:2px;text-transform:uppercase;transition:all .15s;flex-shrink:0;touch-action:none}
+#qContinue{margin:16px auto;padding:14px 32px;background:transparent;
+  border:1.5px solid rgba(0,229,255,.35);border-radius:11px;color:var(--cyan);
+  font-size:clamp(14px,3.8vw,18px);font-weight:700;cursor:pointer;
+  display:none;letter-spacing:2px;text-transform:uppercase;transition:all .15s;flex-shrink:0;touch-action:none}
 #qContinue.show{display:block}
 #qContinue:active{transform:scale(.97);background:rgba(0,229,255,.06)}
 
-/* game over */
-#goScreen{position:fixed;inset:0;z-index:2500;background:rgba(2,6,16,.97);backdrop-filter:blur(8px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;font-size:16px;touch-action:none}
+#goScreen{position:fixed;inset:0;z-index:2500;background:rgba(2,6,16,.97);backdrop-filter:blur(8px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:18px;padding:24px;font-size:16px;touch-action:none}
 #goScreen.show{display:flex}
-.go-over{font-size:clamp(32px,11vw,56px);font-weight:900;letter-spacing:4px;color:var(--pink);text-align:center;text-shadow:0 0 4em var(--pink),0 0 10em rgba(255,26,107,.4);animation:goShake .08s linear 0s 3 alternate}
+.go-over{font-size:clamp(32px,11vw,56px);font-weight:900;letter-spacing:4px;color:var(--pink);
+  text-align:center;text-shadow:0 0 4em var(--pink),0 0 10em rgba(255,26,107,.4);
+  animation:goShake .08s linear 0s 3 alternate}
 @keyframes goShake{from{transform:translateX(-2px)}to{transform:translateX(2px)}}
 .go-lbl{font-size:clamp(11px,3vw,14px);color:rgba(100,116,139,.7);text-transform:uppercase;letter-spacing:6px}
-.go-score{font-size:clamp(40px,14vw,72px);font-weight:900;color:var(--cyan);line-height:1;text-shadow:0 0 4em var(--cyan),0 0 10em rgba(0,229,255,.35);font-variant-numeric:tabular-nums}
-.go-new-best{font-size:clamp(14px,4vw,20px);color:var(--yellow);letter-spacing:4px;text-transform:uppercase;margin-top:-8px;display:none}
-.go-new-best.show{display:block}
+.go-score{font-size:clamp(40px,14vw,72px);font-weight:900;color:var(--cyan);line-height:1;
+  text-shadow:0 0 4em var(--cyan),0 0 10em rgba(0,229,255,.35);font-variant-numeric:tabular-nums}
 .go-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(80%,320px)}
-.go-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px;text-align:center}
+.go-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;padding:14px;text-align:center}
 .go-sv{font-size:clamp(24px,7vw,36px);font-weight:800;color:#e2e8f0}
 .go-sl{font-size:clamp(10px,2.5vw,12px);color:rgba(100,116,139,.7);text-transform:uppercase;letter-spacing:2px;margin-top:4px}
-.go-btn{padding:14px 48px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#fff;border:none;border-radius:14px;font-size:clamp(18px,5.5vw,24px);font-weight:800;letter-spacing:2px;cursor:pointer;text-transform:uppercase;box-shadow:0 0 24px rgba(0,229,255,.5);transition:transform .1s;touch-action:none}
+.go-btn{padding:14px 48px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));
+  color:#fff;border:none;border-radius:14px;font-size:clamp(18px,5.5vw,24px);font-weight:800;
+  letter-spacing:2px;cursor:pointer;text-transform:uppercase;
+  box-shadow:0 0 24px rgba(0,229,255,.5);transition:transform .1s;touch-action:none}
 .go-btn:active{transform:scale(.97)}
 .go-acc{font-size:clamp(11px,3vw,14px);color:rgba(100,116,139,.6);letter-spacing:2px}
 </style>
@@ -236,11 +323,13 @@ html,body{width:100%;height:100%;overflow:hidden;
 <body>
 
 <div id="screenGuard"><div class="sg-icon">📱</div><div class="sg-text">Rotate to portrait or make the window taller</div></div>
+
 <div id="loadScreen">
   <div class="ls-logo">AI-901</div>
   <div class="ls-sub">Space Runner</div>
   <div class="ls-bar"><div class="ls-bar-fill"></div></div>
 </div>
+
 <div id="startScreen">
   <div class="ss-badge">Azure AI Certification</div>
   <div class="ss-title">AI-901 Runner</div>
@@ -248,16 +337,18 @@ html,body{width:100%;height:100%;overflow:hidden;
   <div class="ss-rules">
     <div class="ss-rule"><span class="ss-rule-icon">↔️</span><div>Swipe <strong>left / right</strong> to change lanes</div></div>
     <div class="ss-rule"><span class="ss-rule-icon">❤️</span><div>Start with <strong>3 lives</strong> — collision costs 1</div></div>
-    <div class="ss-rule"><span class="ss-rule-icon">🧠</span><div>Every <strong>20 seconds</strong> — AI-901 quiz break</div></div>
+    <div class="ss-rule"><span class="ss-rule-icon">🧠</span><div>Every <strong>10 seconds</strong> — AI-901 quiz break</div></div>
     <div class="ss-rule"><span class="ss-rule-icon">✅</span><div>Correct = <strong>+1 life</strong> (max 5). Wrong = free</div></div>
-    <div class="ss-rule"><span class="ss-rule-icon">⚡</span><div>Speed <strong>ramps fast</strong> — survive!</div></div>
+    <div class="ss-rule"><span class="ss-rule-icon">⚡</span><div>Speed <strong>increases over time</strong> — survive!</div></div>
   </div>
   <button class="ss-btn" id="startBtn">LAUNCH MISSION</button>
   <div class="ss-controls">Mobile: swipe left / right<br>Desktop: Arrow keys or A / D</div>
 </div>
 
 <div id="gc">
-  <canvas id="starCanvas"></canvas>
+  <div id="starsFar"></div>
+  <div id="starsNear"></div>
+  <div id="starsBright"></div>
   <div id="nebula"></div>
   <div id="dust"></div>
   <div class="lane-line" id="ll1"></div>
@@ -266,18 +357,34 @@ html,body{width:100%;height:100%;overflow:hidden;
   <div id="vignette"></div>
 
   <div id="player">
-    <!-- astronaut structure unchanged -->
     <div class="jp-assembly">
-      <div class="jp-unit"><div class="jp-connector"></div><div class="jp-tank"><div class="jp-band jp-band-1"></div><div class="jp-band jp-band-2"></div><div class="jp-band jp-band-3"></div></div><div class="jp-flame-wrap"><div class="jp-flame jp-flame-outer"></div><div class="jp-flame jp-flame-mid"></div><div class="jp-flame jp-flame-core"></div></div></div>
-      <div class="jp-unit"><div class="jp-connector"></div><div class="jp-tank"><div class="jp-band jp-band-1"></div><div class="jp-band jp-band-2"></div><div class="jp-band jp-band-3"></div></div><div class="jp-flame-wrap"><div class="jp-flame jp-flame-outer"></div><div class="jp-flame jp-flame-mid"></div><div class="jp-flame jp-flame-core"></div></div></div>
+      <div class="jp-unit">
+        <div class="jp-connector"></div>
+        <div class="jp-tank"><div class="jp-band jp-band-1"></div><div class="jp-band jp-band-2"></div><div class="jp-band jp-band-3"></div></div>
+        <div class="jp-flame-wrap"><div class="jp-flame jp-flame-outer"></div><div class="jp-flame jp-flame-mid"></div><div class="jp-flame jp-flame-core"></div></div>
+      </div>
+      <div class="jp-unit">
+        <div class="jp-connector"></div>
+        <div class="jp-tank"><div class="jp-band jp-band-1"></div><div class="jp-band jp-band-2"></div><div class="jp-band jp-band-3"></div></div>
+        <div class="jp-flame-wrap"><div class="jp-flame jp-flame-outer"></div><div class="jp-flame jp-flame-mid"></div><div class="jp-flame jp-flame-core"></div></div>
+      </div>
     </div>
-    <div class="helmet"><div class="visor"><span class="holo holo-1">◈</span><span class="holo holo-2">01</span><span class="holo holo-3">◇</span><span class="holo holo-4">∞</span><span class="holo holo-5">▸</span></div></div>
-    <div class="suit-body"><div class="suit-panel-l"></div><div class="suit-panel-r"></div><div class="chest-logo">▲</div><div class="suit-belt"></div></div>
+    <div class="helmet"><div class="visor">
+      <span class="holo holo-1">◈</span><span class="holo holo-2">01</span>
+      <span class="holo holo-3">◇</span><span class="holo holo-4">∞</span><span class="holo holo-5">▸</span>
+    </div></div>
+    <div class="suit-body">
+      <div class="suit-panel-l"></div><div class="suit-panel-r"></div>
+      <div class="chest-logo">▲</div><div class="suit-belt"></div>
+    </div>
     <div class="suit-legs"><div class="leg"></div><div class="leg"></div></div>
   </div>
 
   <div id="hud">
-    <div class="hud-row1"><div><div id="scoreLbl">Score</div><div id="scoreVal">0</div></div><div id="livesRow"></div></div>
+    <div class="hud-row1">
+      <div><div id="scoreLbl">Score</div><div id="scoreVal">0</div></div>
+      <div id="livesRow"></div>
+    </div>
     <div id="quizBar"><div id="quizFill"></div></div>
     <div id="quizHint">QUIZ INCOMING</div>
   </div>
@@ -290,8 +397,14 @@ html,body{width:100%;height:100%;overflow:hidden;
 <div id="gainFlash"></div>
 
 <div id="quizOverlay">
-  <div class="qo-top"><div class="qo-badge">AI-901 QUIZ BREAK</div><div class="qo-title">Test your Azure AI knowledge</div><div class="qo-reward">Correct = +1 Life (max 5) · Wrong = No penalty</div></div>
-  <div id="qDomain"></div><div id="qText"></div><div id="qOpts"></div>
+  <div class="qo-top">
+    <div class="qo-badge">AI-901 QUIZ BREAK</div>
+    <div class="qo-title">Test your Azure AI knowledge</div>
+    <div class="qo-reward">Correct = +1 Life (max 5) · Wrong = No penalty</div>
+  </div>
+  <div id="qDomain"></div>
+  <div id="qText"></div>
+  <div id="qOpts"></div>
   <div id="qExpl"><strong>Explanation</strong><span id="qExplText"></span></div>
   <button id="qContinue">RESUME MISSION</button>
 </div>
@@ -300,7 +413,6 @@ html,body{width:100%;height:100%;overflow:hidden;
   <div class="go-over">MISSION FAILED</div>
   <div class="go-lbl">Final Score</div>
   <div class="go-score" id="goScore">0</div>
-  <div class="go-new-best" id="goNewBest">✨ NEW HIGH SCORE ✨</div>
   <div class="go-grid">
     <div class="go-stat"><div class="go-sv" id="goCorrect">0</div><div class="go-sl">Correct</div></div>
     <div class="go-stat"><div class="go-sv" id="goTotal">0</div><div class="go-sl">Questions</div></div>
@@ -312,317 +424,250 @@ html,body{width:100%;height:100%;overflow:hidden;
 </div>
 
 <script>
-(function(){
-"use strict";
-
-// -------------------- QUESTION BANK --------------------
 const QS=[
-  {dom:"AI Workloads & Responsible AI",q:"Which responsible AI principle requires that AI systems must NOT create or reinforce unfair bias against groups based on gender, age, or ethnicity?",o:["Reliability & Safety","Transparency","Fairness","Inclusiveness"],a:2,e:"Fairness ensures AI systems don't discriminate on protected characteristics."},
-  {dom:"Generative AI & Foundry",q:"What is a Large Language Model (LLM)?",o:["A database storing labelled training data","A deep learning model trained on massive text that can understand and generate human-like text","A rule-based chatbot","A computer vision model"],a:1,e:"LLMs like GPT-4 are Transformer models trained on vast text."},
-  {dom:"Generative AI & Foundry",q:"What does 'hallucination' mean in LLMs?",o:["Generating text fast","Confidently generating factually incorrect information","Safety filter blocking","Identical outputs"],a:1,e:"Hallucination: plausible but wrong content."},
-  {dom:"NLP & Language AI",q:"Which Azure AI service provides Sentiment Analysis?",o:["Azure AI Vision","Azure AI Custom Vision","Azure AI Translator","Azure AI Language"],a:3,e:"Azure AI Language includes sentiment analysis."},
-  {dom:"Generative AI & Foundry",q:"What is Retrieval-Augmented Generation (RAG)?",o:["Faster GPU inference","Retrieving document chunks as context before generation","Fine-tuning method","Safety filter"],a:1,e:"RAG grounds responses in verified documents."},
-  {dom:"Generative AI & Foundry",q:"What does 'temperature' control in Azure OpenAI?",o:["Max tokens","API timeout","Randomness (lower = deterministic)","Number of completions"],a:2,e:"Temperature = creativity control."},
-  {dom:"AI Workloads & Responsible AI",q:"Which principle ensures people can understand AI decisions?",o:["Fairness","Privacy","Transparency","Reliability"],a:2,e:"Transparency = explainability."},
-  {dom:"Generative AI & Foundry",q:"What is Microsoft Foundry?",o:["Datacenter","Unified AI platform for build/evaluate/deploy","Python library","Microsoft 365 feature"],a:1,e:"Foundry: unified AI development platform."},
-  {dom:"Generative AI & Foundry",q:"What is a 'token' in LLMs?",o:["Security credential","Text unit (word‑piece) for pricing/context","Session ID","Model parameter"],a:1,e:"Tokens ≈ ¾ word; used for billing & limits."},
-  {dom:"Computer Vision & Document AI",q:"Which Azure service extracts structured data from forms?",o:["Azure AI Vision","Custom Vision","Document Intelligence","Face"],a:2,e:"Document Intelligence (formerly Form Recognizer)."},
-  {dom:"Machine Learning",q:"What is 'overfitting'?",o:["Model too simple","Training data errors","Memorises training, fails on new data","GPU memory issue"],a:2,e:"Overfitting: high train accuracy, poor test."},
-  {dom:"Machine Learning",q:"Example of UNSUPERVISED learning?",o:["Labelled cat/dog","Fraud detection with labels","Customer segmentation without labels","Temperature prediction"],a:2,e:"Unsupervised finds patterns in unlabelled data."},
-  {dom:"Generative AI & Foundry",q:"What is 'prompt engineering'?",o:["Fine-tuning","Designing inputs to guide AI output","Serving infrastructure","Converting outputs"],a:1,e:"Prompt engineering improves LLM responses."},
-  {dom:"Generative AI & Foundry",q:"What is an AI agent?",o:["Human reviewer","Fine-tuned model","System that reasons, uses tools, acts autonomously","Monitoring dashboard"],a:2,e:"Agents can search, call APIs, execute code."},
-  {dom:"Generative AI & Foundry",q:"What does the 'system message' do?",o:["Sets max tokens","Provides API key","Contains user question","Defines persona and constraints"],a:3,e:"System message sets role, tone, guardrails."},
-  {dom:"Computer Vision & Document AI",q:"Which task assigns a label to an ENTIRE image?",o:["Object Detection","Semantic Segmentation","Image Classification","OCR"],a:2,e:"Classification labels the whole image."},
-  {dom:"AI Workloads & Responsible AI",q:"Azure AI Content Safety's 'Prompt Shield' detects?",o:["Harmful content","Grammar errors","Prompt injection / jailbreak","Factual errors"],a:2,e:"Prompt Shield blocks indirect attacks."},
-  {dom:"Machine Learning",q:"What is 'data drift'?",o:["Training errors","Production data distribution changes","Frequent retraining","Different outputs for same input"],a:1,e:"Data drift degrades model accuracy."},
-  {dom:"NLP & Language AI",q:"Which feature identifies people, locations, organisations?",o:["Sentiment Analysis","Language Detection","Key Phrase Extraction","Named Entity Recognition (NER)"],a:3,e:"NER extracts real-world entities."},
-  {dom:"Generative AI & Foundry",q:"What is Microsoft Copilot?",o:["Programming language","Physical device","AI assistant across Microsoft 365, Windows, Bing","Database service"],a:2,e:"Copilot = branded AI assistant."}
+{dom:"AI Workloads & Responsible AI",q:"Which responsible AI principle requires that AI systems must NOT create or reinforce unfair bias against groups based on gender, age, or ethnicity?",o:["Reliability & Safety","Transparency","Fairness","Inclusiveness"],a:2,e:"Fairness ensures AI systems don't discriminate on protected characteristics — critical in high-stakes decisions like loan approvals, hiring, or parole."},
+{dom:"Generative AI & Foundry",q:"What is a Large Language Model (LLM)?",o:["A database storing labelled training data","A deep learning model trained on massive text that can understand and generate human-like text","A rule-based chatbot matching inputs to responses","A computer vision model for high-resolution images"],a:1,e:"LLMs like GPT-4 are Transformer-based models trained on vast text data. They can write, summarise, translate, and assist with coding without task-specific programming."},
+{dom:"Generative AI & Foundry",q:"What does 'hallucination' mean in the context of large language models?",o:["When the model generates text at unusually fast speed","When the model confidently generates factually incorrect or fabricated information","When content safety filters block a response","When the model produces identical outputs every time"],a:1,e:"Hallucination is when LLMs generate plausible-sounding but factually wrong or invented content — presented confidently as fact. RAG helps mitigate this."},
+{dom:"NLP & Language AI",q:"Which Azure AI service provides Sentiment Analysis for customer reviews?",o:["Azure AI Vision","Azure AI Custom Vision","Azure AI Translator","Azure AI Language"],a:3,e:"Azure AI Language provides Sentiment Analysis — returning positive/negative/neutral sentiment with confidence scores. It also supports Key Phrase Extraction and NER."},
+{dom:"Generative AI & Foundry",q:"What is Retrieval-Augmented Generation (RAG)?",o:["A technique to make LLMs run faster on GPU hardware","A pattern where relevant document chunks are retrieved and provided as context before generating a response","A fine-tuning method for domain-specific datasets","A content safety filter for blocking harmful outputs"],a:1,e:"RAG retrieves relevant passages from a vector knowledge base and injects them into the LLM prompt — grounding responses in verified documents and preventing hallucination."},
+{dom:"Generative AI & Foundry",q:"What does the 'temperature' parameter control in Azure OpenAI?",o:["The maximum tokens the model generates","The API request timeout in seconds","The randomness of output — lower = deterministic, higher = creative","The number of candidate completions generated"],a:2,e:"Temperature controls sampling randomness. Temperature=0 gives consistent outputs (great for factual tasks). Higher values produce more varied, creative responses."},
+{dom:"AI Workloads & Responsible AI",q:"Which principle requires that people must be able to understand and question AI decisions?",o:["Fairness","Privacy & Security","Transparency","Reliability & Safety"],a:2,e:"Transparency ensures AI systems are understandable and explainable. In high-stakes decisions, people have a right to understand why the AI decided as it did."},
+{dom:"Generative AI & Foundry",q:"What is Microsoft Foundry?",o:["A physical Microsoft datacenter for AI training","Microsoft's unified platform for building, evaluating, deploying and monitoring AI applications","A Python library for fine-tuning models locally","A Microsoft 365 feature adding AI to Word and Excel"],a:1,e:"Microsoft Foundry provides access to foundation models, prompt tools, Azure AI services, evaluation, deployment, and responsible AI features — all in one place."},
+{dom:"Generative AI & Foundry",q:"What is a 'token' in the context of large language models?",o:["A security credential for API authentication","A unit of text (roughly a word-piece) that LLMs process — used for pricing and context limits","A unique session identifier for each conversation","A model parameter updated during training"],a:1,e:"Tokens are the basic units LLMs process — roughly 1 token ≈ ¾ of an English word. Pricing and context window limits are measured in tokens."},
+{dom:"Computer Vision & Document AI",q:"Which Azure AI service extracts structured data from scanned forms and documents?",o:["Azure AI Vision","Azure AI Custom Vision","Azure AI Document Intelligence","Azure AI Face"],a:2,e:"Azure AI Document Intelligence extracts key-value pairs, tables, and fields from documents — with pre-built models for invoices, receipts, IDs, and custom models for unique layouts."},
+{dom:"Machine Learning",q:"What is 'overfitting' in machine learning?",o:["When the model is too simple to learn","When training data contains too many errors","When the model memorises training data and fails to generalise to new data","When the model runs out of GPU memory"],a:2,e:"Overfitting: high training accuracy but poor test performance. The model learned noise rather than patterns. Solutions: regularisation, cross-validation, more data."},
+{dom:"Machine Learning",q:"Which is an example of UNSUPERVISED machine learning?",o:["Training on labelled cat/dog images to classify photos","Using fraud-labelled transactions to detect fraud","Grouping customers into segments WITHOUT predefined labels","Predicting temperature from historical data"],a:2,e:"Unsupervised learning works on unlabelled data — it discovers patterns like customer clusters without being told what groups should look like."},
+{dom:"Generative AI & Foundry",q:"What is 'prompt engineering'?",o:["Fine-tuning a model on domain-specific data","Designing and refining text inputs to guide a generative AI toward desired output","Engineering infrastructure to serve models at scale","Converting model outputs into structured data"],a:1,e:"Prompt engineering uses clear instructions, few-shot examples, role assignment, and chain-of-thought to improve LLM output quality — without changing model weights."},
+{dom:"Generative AI & Foundry",q:"What is an AI agent in modern applications?",o:["A human reviewing AI outputs","A pre-trained model fine-tuned on domain data","An AI system that can reason about goals, use tools, and take multi-step autonomous actions","A monitoring dashboard for model performance"],a:2,e:"AI agents extend LLMs beyond single Q&A. They can search the web, call APIs, execute code, and operate autonomously to complete complex tasks."},
+{dom:"Generative AI & Foundry",q:"What does the 'system message' do in Azure OpenAI?",o:["Specifies maximum tokens","Provides the API key","Contains the user's question","Sets the persistent persona, behaviour, and constraints for the assistant"],a:3,e:"The system message instructs the AI's role, tone, and guardrails. It persists across all conversation turns."},
+{dom:"Computer Vision & Document AI",q:"Which task assigns a label to an ENTIRE image?",o:["Object Detection","Semantic Segmentation","Image Classification","Optical Character Recognition"],a:2,e:"Image Classification assigns one label to the whole image. Object Detection locates items with bounding boxes. Segmentation labels each pixel."},
+{dom:"AI Workloads & Responsible AI",q:"Azure AI Content Safety's 'Prompt Shield' detects what type of attack?",o:["Harmful content like violence","Grammatical errors in outputs","Prompt injection and jailbreak attacks","Factually incorrect responses"],a:2,e:"Prompt Shield detects direct attacks (jailbreaks) and indirect attacks (malicious instructions hidden in retrieved documents)."},
+{dom:"Machine Learning",q:"What is 'data drift' in deployed models?",o:["Training data errors causing poor initial performance","Statistical properties of production data changing over time, causing accuracy to decline","Retraining too frequently","Different outputs for the same input"],a:1,e:"Data drift: production data distribution shifts from training data. Azure ML provides drift monitoring."},
+{dom:"NLP & Language AI",q:"Which Azure AI Language feature identifies entities like people, locations, and organisations?",o:["Sentiment Analysis","Language Detection","Key Phrase Extraction","Named Entity Recognition (NER)"],a:3,e:"NER identifies real-world entities — Person, Location, Organisation, Date — from unstructured text."},
+{dom:"Generative AI & Foundry",q:"What is Microsoft Copilot?",o:["A programming language for AI on Azure","A physical AI computing device","Microsoft's AI assistant integrated across Microsoft 365, Windows, Bing, and Azure using LLMs","A database service for training data"],a:2,e:"Microsoft Copilot is Microsoft's branded AI assistant powered by LLMs, appearing in Word, Excel, Teams, Outlook, Windows 11, GitHub, and Azure."}
 ];
 
 const OT=[
-  {bg:'radial-gradient(circle at 35% 30%,#ff7744,#aa2200)',bd:'#ff5522',gw:'rgba(255,85,34,.5)',br:'42% 58% 35% 65%/55% 40% 60% 45%'},
-  {bg:'linear-gradient(135deg,#ff6b35,#bb1800)',bd:'#ff4411',gw:'rgba(255,68,17,.5)',br:'15% 85% 15% 85%/85% 15% 85% 15%'},
-  {bg:'linear-gradient(180deg,#e63946,#881122)',bd:'#cc2233',gw:'rgba(204,34,51,.5)',br:'20%'},
-  {bg:'radial-gradient(circle at 45% 40%,#ff2266,#770022)',bd:'#ff0044',gw:'rgba(255,0,68,.6)',br:'50%'},
-  {bg:'linear-gradient(45deg,#dd3355,#661133)',bd:'#bb2244',gw:'rgba(187,34,68,.5)',br:'30% 70% 50% 50%/50% 30% 70% 50%'}
+{bg:'radial-gradient(circle at 35% 30%,#ff7744,#aa2200)',bd:'#ff5522',gw:'rgba(255,85,34,.5)',br:'42% 58% 35% 65%/55% 40% 60% 45%'},
+{bg:'linear-gradient(135deg,#ff6b35,#bb1800)',bd:'#ff4411',gw:'rgba(255,68,17,.5)',br:'15% 85% 15% 85%/85% 15% 85% 15%'},
+{bg:'linear-gradient(180deg,#e63946,#881122)',bd:'#cc2233',gw:'rgba(204,34,51,.5)',br:'20%'},
+{bg:'radial-gradient(circle at 45% 40%,#ff2266,#770022)',bd:'#ff0044',gw:'rgba(255,0,68,.6)',br:'50%'},
+{bg:'linear-gradient(45deg,#dd3355,#661133)',bd:'#bb2244',gw:'rgba(187,34,68,.5)',br:'30% 70% 50% 50%/50% 30% 70% 50%'}
 ];
 
-// -------------------- DOM ELEMENTS --------------------
-const $gc = document.getElementById('gc');
-const $player = document.getElementById('player');
-const $scoreVal = document.getElementById('scoreVal');
-const $livesRow = document.getElementById('livesRow');
-const $qFill = document.getElementById('quizFill');
-const $qHint = document.getElementById('quizHint');
-const $qOver = document.getElementById('quizOverlay');
-const $qDomain = document.getElementById('qDomain');
-const $qText = document.getElementById('qText');
-const $qOpts = document.getElementById('qOpts');
-const $qExpl = document.getElementById('qExpl');
-const $qExplTxt = document.getElementById('qExplText');
-const $qCont = document.getElementById('qContinue');
-const $hitFlash = document.getElementById('hitFlash');
-const $gainFlash = document.getElementById('gainFlash');
-const $goScreen = document.getElementById('goScreen');
-const $startSc = document.getElementById('startScreen');
-const $loadSc = document.getElementById('loadScreen');
-const $speedBadge = document.getElementById('speedBadge');
-const $comboText = document.getElementById('comboText');
-const $sg = document.getElementById('screenGuard');
-const $starCanvas = document.getElementById('starCanvas');
-const $goNewBest = document.getElementById('goNewBest');
+const $gc=document.getElementById('gc');
+const $player=document.getElementById('player');
+const $scoreVal=document.getElementById('scoreVal');
+const $livesRow=document.getElementById('livesRow');
+const $qFill=document.getElementById('quizFill');
+const $qHint=document.getElementById('quizHint');
+const $qOver=document.getElementById('quizOverlay');
+const $qDomain=document.getElementById('qDomain');
+const $qText=document.getElementById('qText');
+const $qOpts=document.getElementById('qOpts');
+const $qExpl=document.getElementById('qExpl');
+const $qExplTxt=document.getElementById('qExplText');
+const $qCont=document.getElementById('qContinue');
+const $hitFlash=document.getElementById('hitFlash');
+const $gainFlash=document.getElementById('gainFlash');
+const $goScreen=document.getElementById('goScreen');
+const $startSc=document.getElementById('startScreen');
+const $loadSc=document.getElementById('loadScreen');
+const $speedBadge=document.getElementById('speedBadge');
+const $comboText=document.getElementById('comboText');
+const $sg=document.getElementById('screenGuard');
 
-// -------------------- GAME STATE --------------------
-let running = false, paused = false;
-let lane = 1, lives = 3, score = 0, highScore = 0;
-let gameTime = 0, quizClock = 0;
-let speedMul = 1, spawnTimer = 0, spawnInterval = 850;
-let invincible = false, lastTS = null, rafId = null;
-let totalQ = 0, correctQ = 0, usedQ = [];
-const QUIZ_INTERVAL = 20000, MAX_LIVES = 5, MAX_OBS = 14;
-const BASE_SPEED = 0.82, BASE_INTERVAL = 850, BASE_SCORE_RATE = 24;
+function updateSizes(){$gc.style.fontSize=($gc.offsetWidth/100)+'px'}
+function getLaneCX(i){return $gc.offsetWidth/3*(i+.5)}
+function placePlayer(){const cx=getLaneCX(lane),pw=$player.offsetWidth;$player.style.left=(cx-pw/2)+'px'}
 
-// High score persistence
-try { highScore = parseInt(localStorage.getItem('ai901_highscore')) || 0; } catch(e){}
+let running=false,paused=false;
+let lane=1,lives=3,score=0,highScore=0;
+let gameTime=0,quizClock=0;
+let speedMul=1,spawnTimer=0,spawnInterval=1100;
+let invincible=false,lastTS=null,rafId=null;
+let totalQ=0,correctQ=0,usedQ=[];
+const QUIZ_INTERVAL=10000,MAX_LIVES=5,MAX_OBS=10;
+const BASE_SPEED=0.48,BASE_INTERVAL=1100,BASE_SCORE_RATE=14;
 
-// -------------------- STARFIELD (canvas) --------------------
-let starCtx, stars = [];
-function initStars() {
-  const w = $gc.clientWidth, h = $gc.clientHeight;
-  $starCanvas.width = w; $starCanvas.height = h;
-  starCtx = $starCanvas.getContext('2d');
-  stars = [];
-  for (let i=0; i<180; i++) {
-    stars.push({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      r: Math.random() * 1.8 + 0.8,
-      bright: Math.random() * 0.6 + 0.4,
-      speed: 0.2 + Math.random() * 0.8
-    });
+function genStarCSS(n,m,sz){
+  const p=[];
+  for(let i=0;i<n;i++){
+    const x=(Math.random()*100).toFixed(1),y=(Math.random()*100).toFixed(1),o=(.1+Math.random()*m).toFixed(2);
+    p.push(`radial-gradient(${sz}px ${sz}px at ${x}% ${y}%,rgba(255,255,255,${o}),transparent)`);
   }
-}
-function drawStars() {
-  if (!starCtx) return;
-  const w = $gc.clientWidth, h = $gc.clientHeight;
-  if ($starCanvas.width !== w || $starCanvas.height !== h) {
-    $starCanvas.width = w; $starCanvas.height = h;
-  }
-  starCtx.clearRect(0, 0, w, h);
-  starCtx.fillStyle = '#fff';
-  for (let s of stars) {
-    s.y += s.speed * (speedMul * 0.5 + 0.5);
-    if (s.y > h) { s.y = 0; s.x = Math.random() * w; }
-    starCtx.globalAlpha = s.bright * (0.6 + Math.sin(Date.now()*0.001 + s.x)*0.2);
-    starCtx.beginPath();
-    starCtx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-    starCtx.fill();
-  }
-  starCtx.globalAlpha = 1.0;
+  return p.join(',');
 }
 
-// -------------------- DUST --------------------
 function createDust(){
-  const $d = document.getElementById('dust');
+  const $d=document.getElementById('dust');
   for(let i=0;i<20;i++){
-    const p=document.createElement('div'); p.className='dust-p';
-    const x=Math.random()*100, s=1+Math.random()*2, dur=8+Math.random()*12, del=Math.random()*10;
-    p.style.cssText = `left:${x}%;top:-5px;width:${s}px;height:${s}px;animation-duration:${dur}s;animation-delay:${del}s;opacity:${.05+Math.random()*.15}`;
+    const p=document.createElement('div');p.className='dust-p';
+    const x=Math.random()*100,s=1+Math.random()*2,dur=8+Math.random()*12,del=Math.random()*10;
+    p.style.cssText=`left:${x}%;top:-5px;width:${s}px;height:${s}px;animation-duration:${dur}s;animation-delay:${del}s;opacity:${.05+Math.random()*.15}`;
     $d.appendChild(p);
   }
 }
 
-// -------------------- OBSTACLE POOL --------------------
-const pool = [];
-function mkObs(){ const el=document.createElement('div'); el.className='obs'; el.style.display='none'; $gc.appendChild(el); return {el, lane:0, y:0, active:false, hit:false}; }
-function initPool(){ for(let i=0;i<MAX_OBS;i++) pool.push(mkObs()); }
-function getFree(){ return pool.find(o=>!o.active) || null; }
+const pool=[];
+function mkObs(){const el=document.createElement('div');el.className='obs';el.style.display='none';$gc.appendChild(el);return{el,lane:0,y:0,active:false,hit:false}}
+function initPool(){for(let i=0;i<MAX_OBS;i++)pool.push(mkObs())}
+function getFree(){return pool.find(o=>!o.active)||null}
 function spawnObs(){
-  const o = getFree(); if(!o) return;
-  const t = OT[Math.floor(Math.random()*OT.length)];
-  o.lane = Math.floor(Math.random()*3);
-  o.y = -$gc.offsetHeight*0.13; o.active = true; o.hit = false;
-  const cx = getLaneCX(o.lane), ow = o.el.offsetWidth;
-  o.el.style.cssText = `display:block;left:${cx-ow/2}px;width:11em;height:11em;top:0;background:${t.bg};border:1.5px solid ${t.bd};border-radius:${t.br};box-shadow:0 0 3em ${t.gw},0 0 7em ${t.gw},inset 0 0 2em ${t.gw};transform:translateY(${o.y}px);`;
+  const o=getFree();if(!o)return;
+  const t=OT[Math.floor(Math.random()*OT.length)];
+  o.lane=Math.floor(Math.random()*3);
+  o.y=-$gc.offsetHeight*.13;o.active=true;o.hit=false;
+  const cx=getLaneCX(o.lane),ow=o.el.offsetWidth;
+  o.el.style.cssText=`display:block;left:${cx-ow/2}px;width:11em;height:11em;top:0;
+    background:${t.bg};border:1.5px solid ${t.bd};border-radius:${t.br};
+    box-shadow:0 0 3em ${t.gw},0 0 7em ${t.gw},inset 0 0 2em ${t.gw};
+    transform:translateY(${o.y}px);`;
 }
 
-// -------------------- HELPERS --------------------
-function updateSizes(){ $gc.style.fontSize = ($gc.offsetWidth/100)+'px'; }
-function getLaneCX(i){ return $gc.offsetWidth/3 * (i+0.5); }
-function placePlayer(){ const cx = getLaneCX(lane), pw = $player.offsetWidth; $player.style.left = (cx-pw/2)+'px'; }
+function mvLeft(){if(!running||paused||lane<=0)return;lane--;placePlayer()}
+function mvRight(){if(!running||paused||lane>=2)return;lane++;placePlayer()}
+
 function drawLives(){
-  $livesRow.innerHTML = '';
-  for(let i=0;i<MAX_LIVES;i++){ const s=document.createElement('span'); s.className='lheart'+(i>=lives?' gone':''); s.textContent='❤️'; $livesRow.appendChild(s); }
+  $livesRow.innerHTML='';
+  for(let i=0;i<MAX_LIVES;i++){const s=document.createElement('span');s.className='lheart'+(i>=lives?' gone':'');s.textContent='❤️';$livesRow.appendChild(s)}
 }
 
-function mvLeft(){ if(!running||paused||lane<=0) return; lane--; placePlayer(); }
-function mvRight(){ if(!running||paused||lane>=2) return; lane++; placePlayer(); }
-
-function flashRed(){ $hitFlash.style.opacity='1'; setTimeout(()=>$hitFlash.style.opacity='0',140); }
-function flashGreen(){ $gainFlash.style.opacity='1'; setTimeout(()=>$gainFlash.style.opacity='0',400); }
-function showCombo(t,c){ $comboText.textContent=t; $comboText.style.color=c; $comboText.style.textShadow=`0 0 4em ${c}`; $comboText.style.opacity='1'; setTimeout(()=>$comboText.style.opacity='0',900); }
-
-function spawnParticles(cx,cy,color){
-  for(let i=0;i<12;i++){
-    const p=document.createElement('div'); p.className='part';
-    const ang=(i/12)*Math.PI*2, d=4+Math.random()*8, s=1.2+Math.random()*1.8;
-    p.style.cssText = `left:${cx}px;top:${cy}px;width:${s}em;height:${s}em;background:${color};box-shadow:0 0 ${s}em ${color};--tx:${(Math.cos(ang)*d).toFixed(1)}em;--ty:${(Math.sin(ang)*d).toFixed(1)}em;`;
-    $gc.appendChild(p); setTimeout(()=>p.remove(),550);
-  }
-}
-
-// -------------------- COLLISION --------------------
 function checkColl(){
-  if(invincible) return;
-  const pr = $player.getBoundingClientRect();
+  if(invincible)return;
+  const pr=$player.getBoundingClientRect();
   for(const o of pool){
-    if(!o.active||o.hit) continue;
-    const r = o.el.getBoundingClientRect();
-    if(r.left<pr.right && r.right>pr.left && r.top<pr.bottom && r.bottom>pr.top){
-      o.hit = true; o.active = false; o.el.style.display = 'none';
-      onHit(); return;
+    if(!o.active||o.hit)continue;
+    const r=o.el.getBoundingClientRect();
+    if(r.left<pr.right&&r.right>pr.left&&r.top<pr.bottom&&r.bottom>pr.top){
+      o.hit=true;o.active=false;o.el.style.display='none';onHit();return;
     }
   }
 }
 function onHit(){
-  lives--; drawLives(); shakeGame(); flashRed();
-  const pr = $player.getBoundingClientRect(), gr = $gc.getBoundingClientRect();
-  spawnParticles(pr.left+pr.width/2-gr.left, pr.top+pr.height/2-gr.top, '#ff1a6b');
-  if(lives<=0){ setTimeout(endGame,500); return; }
-  invincible = true; $player.classList.add('inv');
-  setTimeout(()=>{ invincible=false; $player.classList.remove('inv'); },1400);
+  lives--;drawLives();shakeGame();flashRed();
+  const pr=$player.getBoundingClientRect(),gr=$gc.getBoundingClientRect();
+  spawnParticles(pr.left+pr.width/2-gr.left,pr.top+pr.height/2-gr.top,'#ff1a6b');
+  if(lives<=0){setTimeout(endGame,500);return}
+  invincible=true;$player.classList.add('inv');
+  setTimeout(()=>{invincible=false;$player.classList.remove('inv')},1400);
 }
 
 let shakeTO=null;
 function shakeGame(){
-  const seq = ['translate(5px,-3px)','translate(-5px,3px)','translate(3px,5px)','translate(-3px,-5px)','translate(0,0)'];
-  let i=0; clearTimeout(shakeTO);
-  const n = ()=>{ if(i>=seq.length){ $gc.style.transform='translateX(-50%)'; return; } $gc.style.transform=`translateX(-50%) ${seq[i++]}`; shakeTO=setTimeout(n,60); }; n();
+  const seq=['translate(5px,-3px)','translate(-5px,3px)','translate(3px,5px)','translate(-3px,-5px)','translate(0,0)'];
+  let i=0;clearTimeout(shakeTO);
+  const n=()=>{if(i>=seq.length){$gc.style.transform='translateX(-50%)';return}$gc.style.transform=`translateX(-50%) ${seq[i++]}`;shakeTO=setTimeout(n,60)};n();
 }
+function flashRed(){$hitFlash.style.opacity='1';setTimeout(()=>$hitFlash.style.opacity='0',140)}
+function flashGreen(){$gainFlash.style.opacity='1';setTimeout(()=>$gainFlash.style.opacity='0',400)}
+function spawnParticles(cx,cy,color){
+  for(let i=0;i<12;i++){
+    const p=document.createElement('div');p.className='part';
+    const ang=(i/12)*Math.PI*2,d=4+Math.random()*8,s=1.2+Math.random()*1.8;
+    p.style.cssText=`left:${cx}px;top:${cy}px;width:${s}em;height:${s}em;background:${color};box-shadow:0 0 ${s}em ${color};--tx:${(Math.cos(ang)*d).toFixed(1)}em;--ty:${(Math.sin(ang)*d).toFixed(1)}em;`;
+    $gc.appendChild(p);setTimeout(()=>p.remove(),550);
+  }
+}
+function showCombo(t,c){$comboText.textContent=t;$comboText.style.color=c;$comboText.style.textShadow=`0 0 4em ${c}`;$comboText.style.opacity='1';setTimeout(()=>$comboText.style.opacity='0',900)}
 
-// -------------------- QUIZ --------------------
-function pickQ(){ if(usedQ.length>=QS.length) usedQ=[]; const avail = QS.map((_,i)=>i).filter(i=>!usedQ.includes(i)); const idx = avail[Math.floor(Math.random()*avail.length)]; usedQ.push(idx); return {...QS[idx]}; }
+function pickQ(){if(usedQ.length>=QS.length)usedQ=[];const a=QS.map((_,i)=>i).filter(i=>!usedQ.includes(i));const idx=a[Math.floor(Math.random()*a.length)];usedQ.push(idx);return{...QS[idx]}}
 function showQuiz(){
-  paused = true; totalQ++; const q = pickQ();
-  $qDomain.textContent = q.dom; $qText.textContent = q.q;
-  $qOpts.innerHTML = ''; $qExpl.classList.remove('show'); $qExplTxt.textContent = ''; $qCont.classList.remove('show'); $qOver.classList.add('show');
-  ['A','B','C','D'].forEach((l,i)=>{
-    const d = document.createElement('div'); d.className='qopt'; d.innerHTML=`<div class="qltr">${l}</div><div>${q.o[i]}</div>`;
-    d.addEventListener('click',()=>{ if(d.classList.contains('dis')) return; onQuizAnswer(i,q.a,q.e); });
-    $qOpts.appendChild(d);
-  });
+  paused=true;totalQ++;const q=pickQ();
+  $qDomain.textContent=q.dom;$qText.textContent=q.q;
+  $qOpts.innerHTML='';$qExpl.classList.remove('show');$qExplTxt.textContent='';$qCont.classList.remove('show');$qOver.classList.add('show');
+  ['A','B','C','D'].forEach((l,i)=>{const d=document.createElement('div');d.className='qopt';d.innerHTML=`<div class="qltr">${l}</div><div>${q.o[i]}</div>`;d.addEventListener('click',()=>{if(d.classList.contains('dis'))return;onQuizAnswer(i,q.a,q.e)});$qOpts.appendChild(d)});
 }
-function onQuizAnswer(sel, correct, expl){
-  const opts = $qOpts.querySelectorAll('.qopt'); opts.forEach(o=>o.classList.add('dis'));
-  if(sel===correct){
-    opts[sel].classList.add('hit-ok'); correctQ++;
-    if(lives<MAX_LIVES){ lives++; drawLives(); flashGreen(); showCombo('+1 LIFE','var(--green)'); const gr=$gc.getBoundingClientRect(); spawnParticles(gr.width/2,gr.height/2,'#22c55e'); }
+function onQuizAnswer(sel,correct,expl){
+  const opts=$qOpts.querySelectorAll('.qopt');opts.forEach(o=>o.classList.add('dis'));
+  if(sel===correct){opts[sel].classList.add('hit-ok');correctQ++;
+    if(lives<MAX_LIVES){lives++;drawLives();flashGreen();showCombo('+1 LIFE','var(--green)');const gr=$gc.getBoundingClientRect();spawnParticles(gr.width/2,gr.height/2,'#22c55e')}
     else showCombo('PERFECT','var(--yellow)');
-  } else {
-    opts[sel].classList.add('hit-bad'); opts[correct].classList.add('reveal-ok'); showCombo('KEEP STUDYING','#f87171');
-  }
-  $qExplTxt.textContent = expl; $qExpl.classList.add('show'); $qCont.classList.add('show');
+  }else{opts[sel].classList.add('hit-bad');opts[correct].classList.add('reveal-ok');showCombo('KEEP STUDYING','#f87171')}
+  $qExplTxt.textContent=expl;$qExpl.classList.add('show');$qCont.classList.add('show');
 }
-$qCont.addEventListener('click',()=>{
-  $qOver.classList.remove('show'); paused = false; quizClock = 0; $qFill.style.width = '100%'; $qHint.classList.remove('vis');
-  invincible = true; $player.classList.add('inv');
-  setTimeout(()=>{ invincible=false; $player.classList.remove('inv'); },1000);
-  // reset delta time to avoid spike after unpause
-  lastTS = null;
-});
+ $qCont.addEventListener('click',()=>{$qOver.classList.remove('show');paused=false;quizClock=0;$qFill.style.width='100%';$qHint.classList.remove('vis');invincible=true;$player.classList.add('inv');setTimeout(()=>{invincible=false;$player.classList.remove('inv')},1000)});
 
-// -------------------- GAME LOOP --------------------
 function loop(ts){
-  if(!running) return;
-  if(!lastTS) lastTS = ts;
-  const dt = Math.min((ts - lastTS)/1000, 0.05);
-  lastTS = ts;
-
+  if(!running)return;
+  if(!lastTS)lastTS=ts;
+  const dt=Math.min((ts-lastTS)/1000,.05);lastTS=ts;
   if(!paused){
-    gameTime += dt; quizClock += dt*1000;
-    speedMul = Math.min(1 + Math.floor(gameTime/6)*0.12, 3.5);
-    spawnInterval = Math.max(380, BASE_INTERVAL/speedMul);
-    score += dt * BASE_SCORE_RATE * speedMul;
-    $scoreVal.textContent = Math.floor(score).toLocaleString();
-    $speedBadge.textContent = `×${speedMul.toFixed(1)}`;
-    
-    spawnTimer += dt*1000;
-    if(spawnTimer >= spawnInterval){ spawnTimer=0; spawnObs(); if(speedMul>1.2&&Math.random()<.35) setTimeout(spawnObs,120); if(speedMul>2&&Math.random()<.2) setTimeout(spawnObs,240); }
-    
-    const gcH = $gc.offsetHeight, spd = gcH * BASE_SPEED * speedMul;
-    for(const o of pool){ if(!o.active) continue; o.y += spd*dt; o.el.style.transform = `translateY(${o.y}px)`; if(o.y>gcH+60){ o.active=false; o.el.style.display='none'; } }
-    
+    gameTime+=dt;quizClock+=dt*1000;
+    speedMul=Math.min(1+Math.floor(gameTime/10)*.08,2.5);
+    spawnInterval=Math.max(550,BASE_INTERVAL/speedMul);
+    score+=dt*BASE_SCORE_RATE*speedMul;
+    $scoreVal.textContent=Math.floor(score).toLocaleString();
+    $speedBadge.textContent=`×${speedMul.toFixed(1)}`;
+    spawnTimer+=dt*1000;
+    if(spawnTimer>=spawnInterval){spawnTimer=0;spawnObs();
+      if(speedMul>1.6&&Math.random()<.25)setTimeout(spawnObs,200);
+    }
+    const gcH=$gc.offsetHeight,spd=gcH*BASE_SPEED*speedMul;
+    for(const o of pool){if(!o.active)continue;o.y+=spd*dt;o.el.style.transform=`translateY(${o.y}px)`;if(o.y>gcH+60){o.active=false;o.el.style.display='none'}}
     checkColl();
-    drawStars();
-    
-    const ratio = 1 - quizClock/QUIZ_INTERVAL; $qFill.style.width = Math.max(0, ratio*100)+'%';
-    if(quizClock > QUIZ_INTERVAL-5000) $qHint.classList.add('vis');
-    if(quizClock >= QUIZ_INTERVAL) showQuiz();
+    const ratio=1-quizClock/QUIZ_INTERVAL;$qFill.style.width=Math.max(0,ratio*100)+'%';
+    if(quizClock>QUIZ_INTERVAL-3000)$qHint.classList.add('vis');
+    if(quizClock>=QUIZ_INTERVAL)showQuiz();
   }
-  rafId = requestAnimationFrame(loop);
+  rafId=requestAnimationFrame(loop);
 }
 
-// -------------------- START / END --------------------
 function startGame(){
-  updateSizes(); lane=1; lives=3; score=0; gameTime=0; quizClock=0; speedMul=1; spawnTimer=0; invincible=false; lastTS=null; usedQ=[]; totalQ=0; correctQ=0;
-  for(const o of pool){ o.active=false; o.hit=false; o.el.style.display='none'; }
-  drawLives(); $scoreVal.textContent='0'; $qFill.style.width='100%'; $qHint.classList.remove('vis');
-  $player.classList.remove('inv'); $comboText.style.opacity='0';
-  $startSc.style.opacity='0'; setTimeout(()=>$startSc.style.display='none',400);
-  $goScreen.classList.remove('show'); $qOver.classList.remove('show');
-  placePlayer(); running=true; paused=false;
-  invincible=true; $player.classList.add('inv');
-  setTimeout(()=>{ invincible=false; $player.classList.remove('inv'); },1200);
-  if(rafId) cancelAnimationFrame(rafId);
-  initStars(); // reinit stars for new size
-  rafId = requestAnimationFrame(loop);
+  updateSizes();lane=1;lives=3;score=0;gameTime=0;quizClock=0;speedMul=1;spawnTimer=0;
+  invincible=false;lastTS=null;usedQ=[];totalQ=0;correctQ=0;
+  for(const o of pool){o.active=false;o.hit=false;o.el.style.display='none'}
+  drawLives();$scoreVal.textContent='0';$qFill.style.width='100%';$qHint.classList.remove('vis');
+  $player.classList.remove('inv');$comboText.style.opacity='0';
+  $startSc.style.opacity='0';setTimeout(()=>$startSc.style.display='none',400);
+  $goScreen.classList.remove('show');$qOver.classList.remove('show');
+  placePlayer();running=true;paused=false;
+  invincible=true;$player.classList.add('inv');
+  setTimeout(()=>{invincible=false;$player.classList.remove('inv')},1200);
+  if(rafId)cancelAnimationFrame(rafId);rafId=requestAnimationFrame(loop);
 }
-
 function endGame(){
-  running = false; paused = false; if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
-  const fs = Math.floor(score);
-  const isNewHigh = fs > highScore;
-  if(isNewHigh){ highScore = fs; try { localStorage.setItem('ai901_highscore', highScore); } catch(e){} }
-  document.getElementById('goScore').textContent = fs.toLocaleString();
-  document.getElementById('goCorrect').textContent = correctQ;
-  document.getElementById('goTotal').textContent = totalQ;
-  document.getElementById('goTime').textContent = Math.floor(gameTime)+'s';
-  document.getElementById('goHigh').textContent = highScore.toLocaleString();
-  $goNewBest.classList.toggle('show', isNewHigh);
-  const acc = totalQ>0 ? Math.round(correctQ/totalQ*100) : 0;
-  document.getElementById('goAcc').textContent = totalQ>0 ? `Quiz accuracy: ${correctQ}/${totalQ} (${acc}%)` : 'No quiz questions answered';
+  running=false;paused=false;if(rafId){cancelAnimationFrame(rafId);rafId=null}
+  const fs=Math.floor(score);if(fs>highScore)highScore=fs;
+  document.getElementById('goScore').textContent=fs.toLocaleString();
+  document.getElementById('goCorrect').textContent=correctQ;
+  document.getElementById('goTotal').textContent=totalQ;
+  document.getElementById('goTime').textContent=Math.floor(gameTime)+'s';
+  document.getElementById('goHigh').textContent=highScore.toLocaleString();
+  const acc=totalQ>0?Math.round(correctQ/totalQ*100):0;
+  document.getElementById('goAcc').textContent=totalQ>0?`Quiz accuracy: ${correctQ}/${totalQ} (${acc}%)`:'No quiz questions answered';
   setTimeout(()=>$goScreen.classList.add('show'),300);
 }
 
-// -------------------- CONTROLS --------------------
-let txStart=0, tyStart=0;
-document.addEventListener('touchstart', e=>{ txStart=e.touches[0].clientX; tyStart=e.touches[0].clientY; }, {passive:true});
-document.addEventListener('touchend', e=>{
-  const dx=e.changedTouches[0].clientX-txStart, dy=e.changedTouches[0].clientY-tyStart;
-  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>28) dx>0 ? mvRight() : mvLeft();
+/* ─── CONTROLS ────────────────────────────────────────────── */
+let txStart=0,tyStart=0;
+document.addEventListener('touchstart',e=>{txStart=e.touches[0].clientX;tyStart=e.touches[0].clientY},{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-txStart;
+  const dy=e.changedTouches[0].clientY-tyStart;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>28){dx>0?mvRight():mvLeft()}
 },{passive:true});
-document.addEventListener('keydown', e=>{
-  if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A') mvLeft();
-  if(e.key==='ArrowRight'||e.key==='d'||e.key==='D') mvRight();
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')mvLeft();
+  if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')mvRight();
 });
-document.getElementById('startBtn').addEventListener('click', startGame);
-document.getElementById('retryBtn').addEventListener('click', startGame);
+document.getElementById('startBtn').addEventListener('click',startGame);
+document.getElementById('retryBtn').addEventListener('click',startGame);
 
-function checkScreen(){ $sg.classList.toggle('show', window.innerHeight<420); }
-window.addEventListener('resize', checkScreen);
-window.addEventListener('orientationchange', ()=>setTimeout(checkScreen,200));
-window.addEventListener('resize', ()=>{
-  checkScreen(); updateSizes();
-  if(running){ placePlayer(); for(const o of pool){ if(o.active) o.el.style.left = (getLaneCX(o.lane)-o.el.offsetWidth/2)+'px'; } }
-  initStars();
+function checkScreen(){$sg.classList.toggle('show',window.innerHeight<420)}
+window.addEventListener('resize',checkScreen);
+window.addEventListener('orientationchange',()=>setTimeout(checkScreen,200));
+window.addEventListener('resize',()=>{checkScreen();updateSizes();
+  if(running){placePlayer();for(const o of pool){if(o.active)o.el.style.left=(getLaneCX(o.lane)-o.el.offsetWidth/2)+'px'}}
 });
 
-// -------------------- INIT --------------------
-window.addEventListener('load', ()=>{
-  createDust(); initPool(); updateSizes(); checkScreen(); initStars();
-  setTimeout(()=>{ $loadSc.classList.add('out'); setTimeout(()=>$loadSc.style.display='none',700); },950);
+window.addEventListener('load',()=>{
+  document.getElementById('starsFar').style.backgroundImage=genStarCSS(120,.4,1);
+  document.getElementById('starsNear').style.backgroundImage=genStarCSS(60,.8,1.5);
+  document.getElementById('starsBright').style.backgroundImage=genStarCSS(15,.9,2);
+  createDust();initPool();updateSizes();checkScreen();
+  setTimeout(()=>{$loadSc.classList.add('out');setTimeout(()=>$loadSc.style.display='none',700)},950);
 });
-})();
 </script>
 </body>
 </html>
