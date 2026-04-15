@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>AI-901 Runner</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cyan:#00e5ff;--cyan2:#00b8d9;--pink:#ff1a6b;--purple:#a855f7;
+  --green:#22c55e;--yellow:#fbbf24;--bg:#020610;
+}
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 40%,#0a1628,#020610 70%);
+  color:#e2e8f0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  -webkit-tap-highlight-color:transparent;user-select:none;touch-action:none;
+}
+
+/* ─── SCREEN GUARD ────────────────────────────────────────────── */
+#screenGuard{
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:var(--bg);align-items:center;justify-content:center;
+  flex-direction:column;gap:16px;text-align:center;padding:24px;
+}
+#screenGuard.show{display:flex}
+#screenGuard .sg-icon{font-size:48px}
+#screenGuard .sg-text{font-size:16px;color:var(--cyan);letter-spacing:2px;max-width:320px}
+
+/* ─── LOADING ─────────────────────────────────────────────────── */
+#loadScreen{
+  position:fixed;inset:0;z-index:5000;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  font-size:16px;transition:opacity .6s;
+}
+#loadScreen.out{opacity:0;pointer-events:none}
+.ls-logo{
+  font-size:clamp(32px,12vw,72px);font-weight:900;letter-spacing:8px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 8px rgba(0,229,255,.5));
+  animation:lsPulse 1.2s ease-in-out infinite alternate;
+}
+@keyframes lsPulse{from{filter:drop-shadow(0 0 8px rgba(0,229,255,.4))}to{filter:drop-shadow(0 0 24px rgba(0,229,255,.9))}}
+.ls-sub{font-size:clamp(10px,3.5vw,14px);color:rgba(0,229,255,.5);letter-spacing:12px;text-transform:uppercase}
+.ls-bar{width:min(40vw,200px);height:2px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.ls-bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:2px;animation:lsLoad .9s ease-out forwards;width:0}
+@keyframes lsLoad{to{width:100%}}
+
+/* ─── START SCREEN ────────────────────────────────────────────── */
+#startScreen{
+  position:fixed;inset:0;z-index:2000;
+  background:linear-gradient(180deg,var(--bg),#060e1e 50%,var(--bg));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;gap:16px;overflow-y:auto;font-size:16px;
+  touch-action:pan-y;-webkit-overflow-scrolling:touch;
+  transition:opacity .4s;
+}
+#startScreen.out{opacity:0;pointer-events:none}
+.ss-badge{font-size:clamp(10px,2.8vw,14px);color:var(--cyan);text-transform:uppercase;letter-spacing:8px;
+  border:1px solid rgba(0,229,255,.25);border-radius:20px;padding:6px 16px;background:rgba(0,229,255,.04);
+  max-width:480px;text-align:center}
+.ss-title{font-size:clamp(28px,9vw,56px);font-weight:900;text-align:center;line-height:1.1;letter-spacing:-2px;
+  background:linear-gradient(135deg,var(--cyan),#7dd3fc 40%,var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 12px rgba(0,229,255,.3))}
+.ss-sub{font-size:clamp(13px,3.5vw,18px);color:rgba(125,211,252,.7);text-align:center;line-height:1.5;max-width:480px}
+.ss-rules{
+  width:100%;max-width:480px;background:rgba(0,229,255,.03);
+  border:1px solid rgba(0,229,255,.12);border-radius:14px;padding:16px 20px;
+  display:flex;flex-direction:column;gap:12px}
+.ss-rule{display:flex;align-items:flex-start;gap:14px;font-size:clamp(13px,3.3vw,15px);color:rgba(203,213,225,.8);line-height:1.5}
+.ss-rule-icon{font-size:clamp(18px,5.5vw,24px);flex-shrink:0}
+.ss-rule strong{color:#e2e8f0}
+.ss-btn{
+  padding:14px 48px;
+  background:linear-gradient(135deg,var(--cyan),var(--cyan2));
+  color:#fff;border:none;border-radius:14px;
+  font-size:clamp(18px,5.5vw,24px);font-weight:800;letter-spacing:2px;cursor:pointer;
+  box-shadow:0 0 20px rgba(0,229,255,.4),0 0 50px rgba(0,229,255,.15);
+  animation:ssPulse 2s ease-in-out infinite;transition:transform .1s;
+  text-transform:uppercase;touch-action:none;
+}
+.ss-btn:active{transform:scale(.96)}
+@keyframes ssPulse{0%,100%{box-shadow:0 0 20px rgba(0,229,255,.4)}50%{box-shadow:0 0 35px rgba(0,229,255,.7),0 0 70px rgba(0,229,255,.25)}}
+.ss-controls{font-size:clamp(11px,2.8vw,14px);color:rgba(100,116,139,.5);text-align:center;line-height:1.8}
+
+/* ─── GAME CONTAINER (CONSTRAINED + CENTERED) ────────────────── */
+#gc{
+  position:fixed;left:50%;transform:translateX(-50%);
+  width:min(100vw,480px);height:100vh;overflow:hidden;
+  background:linear-gradient(180deg,#020610,#040c1a 40%,#06101f);
+  touch-action:none;
+}
+
+/* ─── STAR FIELDS ─────────────────────────────────────────────── */
+#starsFar,#starsNear{position:absolute;inset:0;pointer-events:none;background-repeat:repeat;background-size:100% 100%}
+#starsFar{animation:starDrift 50s linear infinite;opacity:.7}
+#starsNear{animation:starDrift 30s linear infinite}
+@keyframes starDrift{from{background-position:0 0}to{background-position:0 100%}}
+#nebula{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 15% 75%,rgba(0,80,200,.07),transparent 50%),
+  radial-gradient(ellipse at 85% 25%,rgba(100,0,180,.05),transparent 45%),
+  radial-gradient(ellipse at 50% 10%,rgba(0,150,200,.04),transparent 40%)}
+#spaceGlow{position:absolute;left:0;right:0;bottom:0;height:15%;pointer-events:none;
+  background:linear-gradient(0deg,rgba(0,100,200,.06),transparent)}
+
+/* ─── LANE LINES ──────────────────────────────────────────────── */
+.lane-line{position:absolute;top:8%;bottom:0;width:1px;
+  background:linear-gradient(180deg,transparent,rgba(0,229,255,.06) 10%,rgba(0,229,255,.12) 50%,rgba(0,229,255,.06) 90%,transparent)}
+.lane-line::before{content:'';position:absolute;top:0;bottom:0;left:-2px;width:5px;background:inherit;filter:blur(3px);opacity:.4}
+#ll1{left:33.333%}#ll2{left:66.666%}
+
+/* ─── MRMAKES CHARACTER (em-scaled inside #gc) ────────────────── */
+#player{
+  position:absolute;bottom:5%;
+  width:14em;
+  will-change:left;transition:left .12s cubic-bezier(.25,.8,.25,1);
+  animation:spaceHover 2.5s ease-in-out infinite;z-index:50;
+  filter:drop-shadow(0 0 3em rgba(0,229,255,.4));
+}
+#player.inv::after{content:'';position:absolute;inset:-3em;border-radius:50%;
+  background:var(--bg);animation:invBlink .2s linear infinite;pointer-events:none;z-index:99}
+@keyframes invBlink{0%,100%{opacity:0}50%{opacity:.75}}
+@keyframes spaceHover{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.2em)}}
+
+.jp-tank{position:absolute;width:2.4em;height:7.5em;
+  background:linear-gradient(90deg,#6a6a7a,#9a9aaa,#7a7a8a);border-radius:1.2em;
+  top:4.5em;z-index:1;box-shadow:0 0 1em rgba(0,180,216,.2)}
+.jp-tank::before{content:'';position:absolute;top:-.6em;left:.3em;right:.3em;height:1em;
+  background:linear-gradient(180deg,#888,#aaa);border-radius:.5em .5em 0 0}
+.jp-tank::after{content:'';position:absolute;bottom:-.3em;left:.2em;right:.2em;height:.6em;
+  background:#555;border-radius:0 0 .8em .8em}
+.jp-l{left:-.8em}.jp-r{right:-.8em}
+.jp-flame{position:absolute;width:1.8em;top:11.5em;z-index:1;
+  background:linear-gradient(180deg,var(--cyan),#0066cc,rgba(0,80,200,0));
+  border-radius:0 0 50% 50%;filter:blur(1.5px);animation:thrustFlicker .12s ease-in-out infinite alternate}
+.jp-fl{left:.2em}.jp-fr{right:.2em}
+@keyframes thrustFlicker{0%{height:3em;opacity:.6}100%{height:5.5em;opacity:1}}
+
+.helmet{width:10.5em;height:9.5em;margin:0 auto .5em;
+  background:linear-gradient(180deg,#e8e8f0,#c8c8d8);border-radius:48% 48% 42% 42%;
+  position:relative;z-index:2;box-shadow:0 .3em 1em rgba(0,0,0,.3),0 0 1.5em rgba(200,200,220,.15)}
+.helmet::before{content:'';position:absolute;top:.3em;left:1.5em;right:1.5em;height:.6em;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);border-radius:50%}
+.visor{position:absolute;top:1.5em;left:1.8em;right:1.8em;bottom:1em;
+  background:linear-gradient(180deg,#00b4d8,#0077b6,#005f8a);border-radius:40% 40% 44% 44%;
+  box-shadow:0 0 3em rgba(0,180,216,.5),inset 0 0 2em rgba(0,229,255,.25),inset 0 -.5em 1em rgba(0,0,0,.2);overflow:hidden}
+.visor::before{content:'';position:absolute;top:15%;left:10%;width:30%;height:20%;
+  background:linear-gradient(180deg,rgba(255,255,255,.15),transparent);border-radius:50%;transform:rotate(-15deg)}
+.holo{position:absolute;color:rgba(255,255,255,.55);text-shadow:0 0 3px rgba(0,229,255,.7);
+  animation:holoFloat 3s ease-in-out infinite;pointer-events:none}
+.holo-1{top:22%;left:18%;font-size:2em;animation-delay:0s}
+.holo-2{top:50%;left:52%;font-size:1.6em;animation-delay:1s}
+.holo-3{top:28%;left:62%;font-size:1.8em;animation-delay:2s}
+@keyframes holoFloat{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-.6em);opacity:.85}}
+
+.suit-body{width:11.5em;height:8.5em;margin:0 auto;
+  background:linear-gradient(180deg,#f0f0f5,#d8d8e2);border-radius:22% 22% 14% 14%;
+  position:relative;z-index:2;border:.3em solid rgba(0,180,216,.25);
+  box-shadow:0 0 2em rgba(0,180,216,.1)}
+.suit-body::before{content:'';position:absolute;top:0;left:0;right:0;height:.45em;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  box-shadow:0 0 4px var(--cyan),0 0 8px rgba(0,229,255,.3)}
+.suit-body::after{content:'';position:absolute;top:.6em;bottom:.6em;left:50%;width:.2em;
+  background:rgba(0,180,216,.15);transform:translateX(-50%)}
+.chest-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-size:4em;line-height:1;color:var(--cyan);
+  text-shadow:0 0 8px var(--cyan),0 0 16px rgba(0,229,255,.25);font-weight:900}
+.suit-legs{display:flex;justify-content:center;gap:1.8em;margin-top:.6em;position:relative;z-index:2}
+.leg{width:3.2em;height:4.5em;background:linear-gradient(180deg,#d8d8e2,#c0c0cc);
+  border-radius:1.5em 1.5em 1em 1em;border:.25em solid rgba(0,180,216,.18);border-top:none;position:relative}
+.leg::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1em;
+  background:rgba(0,180,216,.15);border-radius:0 0 1em 1em}
+
+/* ─── OBSTACLES ───────────────────────────────────────────────── */
+.obs{position:absolute;top:0;width:11em;height:11em;will-change:transform;pointer-events:none}
+
+/* ─── HUD (em-scaled) ─────────────────────────────────────────── */
+#hud{position:absolute;top:0;left:0;right:0;padding:2.5em 4em 1.5em;z-index:100;pointer-events:none}
+.hud-row1{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2em}
+#scoreLbl{font-size:2.2em;color:rgba(0,229,255,.45);letter-spacing:1em;text-transform:uppercase;margin-bottom:.3em}
+#scoreVal{font-size:8.5em;font-weight:900;color:var(--cyan);line-height:1;
+  text-shadow:0 0 3em var(--cyan),0 0 8em rgba(0,229,255,.4);font-variant-numeric:tabular-nums}
+#livesRow{display:flex;gap:1.2em;align-items:center;padding-top:.3em}
+.lheart{font-size:6em;transition:all .35s;filter:drop-shadow(0 0 2px rgba(255,50,100,.8))}
+.lheart.gone{filter:grayscale(1) opacity(.2);transform:scale(.8)}
+#quizBar{height:2px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+#quizFill{height:100%;width:100%;border-radius:2px;background:linear-gradient(90deg,var(--cyan),var(--purple));transform-origin:left}
+#quizHint{font-size:2.5em;color:rgba(0,229,255,.5);letter-spacing:.8em;text-transform:uppercase;
+  text-align:center;margin-top:1.5em;opacity:0;transition:opacity .5s}
+#quizHint.vis{opacity:1;animation:hintAnim 1.2s ease-in-out infinite}
+@keyframes hintAnim{0%,100%{opacity:.4}50%{opacity:1}}
+#speedBadge{position:absolute;bottom:4%;right:4%;font-size:3em;font-weight:700;
+  color:rgba(0,229,255,.3);pointer-events:none;letter-spacing:.3em}
+
+/* ─── EFFECTS ─────────────────────────────────────────────────── */
+#hitFlash{position:fixed;inset:0;z-index:4000;background:rgba(255,0,80,.35);opacity:0;pointer-events:none;transition:opacity .08s}
+#gainFlash{position:fixed;inset:0;z-index:4000;background:rgba(0,255,100,.2);opacity:0;pointer-events:none;transition:opacity .08s}
+.part{position:absolute;border-radius:50%;pointer-events:none;animation:partFly .55s ease-out forwards;z-index:200}
+@keyframes partFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(.15)}}
+#comboText{position:absolute;top:28%;left:50%;transform:translateX(-50%);font-size:6em;font-weight:900;
+  color:var(--yellow);text-shadow:0 0 4em var(--yellow);pointer-events:none;opacity:0;letter-spacing:.5em;z-index:150}
+#swipeHint{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);font-size:3em;
+  color:rgba(0,229,255,.3);letter-spacing:.5em;pointer-events:none;text-transform:uppercase;
+  animation:swipeFade 3.5s ease-out 1.5s forwards;opacity:0}
+@keyframes swipeFade{0%{opacity:0}5%{opacity:1}80%{opacity:.5}100%{opacity:0}}
+
+/* ─── QUIZ OVERLAY (full-screen, own font-size) ───────────────── */
+#quizOverlay{
+  position:fixed;inset:0;z-index:3000;background:rgba(2,6,16,.97);
+  backdrop-filter:blur(8px);display:none;flex-direction:column;align-items:center;
+  justify-content:center;padding:24px;overflow-y:auto;gap:0;font-size:16px;
+  touch-action:pan-y;-webkit-overflow-scrolling:touch;
+}
+#quizOverlay.show{display:flex}
+.qo-top{text-align:center;padding:0 0 16px;flex-shrink:0;max-width:560px;width:100%}
+.qo-badge{display:inline-block;font-size:clamp(10px,2.5vw,14px);letter-spacing:8px;color:var(--cyan);
+  text-transform:uppercase;border:1px solid rgba(0,229,255,.25);border-radius:20px;
+  padding:6px 20px;margin-bottom:12px;background:rgba(0,229,255,.04)}
+.qo-title{font-size:clamp(16px,3.8vw,22px);color:#7dd3fc;font-weight:700;margin-bottom:8px}
+.qo-reward{font-size:clamp(12px,3vw,16px);color:var(--green);text-shadow:0 0 8px rgba(34,197,94,.5)}
+#qDomain{display:inline-block;font-size:clamp(10px,2.3vw,13px);letter-spacing:4px;
+  color:rgba(168,85,247,.8);text-transform:uppercase;margin-bottom:12px}
+#qText{font-size:clamp(14px,4.3vw,18px);color:#e2e8f0;line-height:1.6;text-align:center;
+  padding:16px 20px;margin:0 auto 16px;background:rgba(0,229,255,.03);
+  border:1px solid rgba(0,229,255,.1);border-radius:14px;max-width:560px;width:100%;flex-shrink:0}
+#qOpts{display:flex;flex-direction:column;gap:10px;width:100%;max-width:560px;flex-shrink:0}
+.qopt{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;
+  background:rgba(255,255,255,.035);border:1.5px solid rgba(255,255,255,.09);
+  border-radius:11px;cursor:pointer;font-size:clamp(13px,3.5vw,16px);color:#cbd5e1;
+  line-height:1.5;transition:all .15s;text-align:left;touch-action:none}
+.qopt:active{transform:scale(.98)}
+.qopt.dis{pointer-events:none}
+.qopt.hit-ok{border-color:var(--green);background:rgba(34,197,94,.08);color:#4ade80}
+.qopt.hit-bad{border-color:#dc2626;background:rgba(220,38,38,.08);color:#f87171}
+.qopt.reveal-ok{border-color:var(--green);background:rgba(34,197,94,.05);color:#4ade80}
+.qltr{width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:rgba(148,163,184,.7)}
+.qopt.hit-ok .qltr{background:var(--green);border-color:var(--green);color:#fff}
+.qopt.hit-bad .qltr{background:#dc2626;border-color:#dc2626;color:#fff}
+.qopt.reveal-ok .qltr{background:var(--green);border-color:var(--green);color:#fff}
+#qExpl{margin:12px auto 0;padding:14px 16px;background:rgba(0,229,255,.04);
+  border-left:3px solid var(--cyan);border-radius:0 10px 10px 0;
+  font-size:clamp(12px,3.3vw,15px);color:#94a3b8;line-height:1.65;
+  max-width:560px;width:100%;display:none;flex-shrink:0;
+  border:1px solid rgba(0,229,255,.1);border-left:3px solid var(--cyan)}
+#qExpl.show{display:block}
+#qExpl strong{color:var(--cyan);display:block;margin-bottom:6px;font-size:clamp(11px,2.8vw,13px);letter-spacing:2px;text-transform:uppercase}
+#qContinue{margin:16px auto;padding:14px 32px;background:transparent;
+  border:1.5px solid rgba(0,229,255,.35);border-radius:11px;color:var(--cyan);
+  font-size:clamp(14px,3.8vw,18px);font-weight:700;cursor:pointer;
+  display:none;letter-spacing:2px;text-transform:uppercase;transition:all .15s;flex-shrink:0;touch-action:none}
+#qContinue.show{display:block}
+#qContinue:active{transform:scale(.97);background:rgba(0,229,255,.06)}
+
+/* ─── GAME OVER (full-screen) ─────────────────────────────────── */
+#goScreen{
+  position:fixed;inset:0;z-index:2500;background:rgba(2,6,16,.97);backdrop-filter:blur(6px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:18px;padding:24px;font-size:16px;touch-action:none;
+}
+#goScreen.show{display:flex}
+.go-over{font-size:clamp(32px,11vw,56px);font-weight:900;letter-spacing:4px;color:var(--pink);
+  text-align:center;text-shadow:0 0 4em var(--pink),0 0 10em rgba(255,26,107,.4);
+  animation:goShake .08s linear 0s 3 alternate}
+@keyframes goShake{from{transform:translateX(-2px)}to{transform:translateX(2px)}}
+.go-lbl{font-size:clamp(11px,3vw,14px);color:rgba(100,116,139,.7);text-transform:uppercase;letter-spacing:6px}
+.go-score{font-size:clamp(40px,14vw,72px);font-weight:900;color:var(--cyan);line-height:1;
+  text-shadow:0 0 4em var(--cyan),0 0 10em rgba(0,229,255,.35);font-variant-numeric:tabular-nums}
+.go-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(80%,320px)}
+.go-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;padding:14px;text-align:center}
+.go-sv{font-size:clamp(24px,7vw,36px);font-weight:800;color:#e2e8f0}
+.go-sl{font-size:clamp(10px,2.5vw,12px);color:rgba(100,116,139,.7);text-transform:uppercase;letter-spacing:2px;margin-top:4px}
+.go-btn{padding:14px 48px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));
+  color:#fff;border:none;border-radius:14px;font-size:clamp(18px,5.5vw,24px);font-weight:800;
+  letter-spacing:2px;cursor:pointer;text-transform:uppercase;
+  box-shadow:0 0 20px rgba(0,229,255,.4);transition:transform .1s;touch-action:none}
+.go-btn:active{transform:scale(.97)}
+.go-acc{font-size:clamp(11px,3vw,14px);color:rgba(100,116,139,.6);letter-spacing:2px}
+</style>
+</head>
+<body>
+
+<div id="screenGuard">
+  <div class="sg-icon">📱</div>
+  <div class="sg-text">Rotate your device to portrait or make the window taller to play</div>
+</div>
+
+<div id="loadScreen">
+  <div class="ls-logo">AI-901</div>
+  <div class="ls-sub">Space Runner</div>
+  <div class="ls-bar"><div class="ls-bar-fill"></div></div>
+</div>
+
+<div id="startScreen">
+  <div class="ss-badge">Azure AI Certification</div>
+  <div class="ss-title">AI-901 Runner</div>
+  <div class="ss-sub">Navigate through asteroid fields. Answer questions. Master Azure AI Fundamentals.</div>
+  <div class="ss-rules">
+    <div class="ss-rule"><span class="ss-rule-icon">↔️</span><div>Swipe <strong>left / right</strong> or use <strong>arrow keys</strong> to change lanes</div></div>
+    <div class="ss-rule"><span class="ss-rule-icon">❤️</span><div>Start with <strong>3 lives</strong> — a collision loses 1 life</div></div>
+    <div class="ss-rule"><span class="ss-rule-icon">🧠</span><div>Every <strong>30 seconds</strong> the game pauses for an AI-901 quiz question</div></div>
+    <div class="ss-rule"><span class="ss-rule-icon">✅</span><div>Correct answer = <strong>+1 life</strong> (max 5). Wrong = no penalty</div></div>
+    <div class="ss-rule"><span class="ss-rule-icon">⚡</span><div>Speed <strong>increases over time</strong> — how long can you survive?</div></div>
+  </div>
+  <button class="ss-btn" id="startBtn">LAUNCH MISSION</button>
+  <div class="ss-controls">Mobile: swipe left / right<br>Desktop: Arrow keys or A / D</div>
+</div>
+
+<div id="gc">
+  <div id="starsFar"></div>
+  <div id="starsNear"></div>
+  <div id="nebula"></div>
+  <div class="lane-line" id="ll1"></div>
+  <div class="lane-line" id="ll2"></div>
+  <div id="spaceGlow"></div>
+
+  <div id="player">
+    <div class="jp-tank jp-l"></div>
+    <div class="jp-tank jp-r"></div>
+    <div class="jp-flame jp-fl"></div>
+    <div class="jp-flame jp-fr"></div>
+    <div class="helmet"><div class="visor">
+      <span class="holo holo-1">◈</span>
+      <span class="holo holo-2">01</span>
+      <span class="holo holo-3">◇</span>
+    </div></div>
+    <div class="suit-body"><div class="chest-logo">▲</div></div>
+    <div class="suit-legs"><div class="leg"></div><div class="leg"></div></div>
+  </div>
+
+  <div id="hud">
+    <div class="hud-row1">
+      <div><div id="scoreLbl">Score</div><div id="scoreVal">0</div></div>
+      <div id="livesRow"></div>
+    </div>
+    <div id="quizBar"><div id="quizFill"></div></div>
+    <div id="quizHint">QUIZ INCOMING</div>
+  </div>
+
+  <div id="speedBadge"></div>
+  <div id="swipeHint">SWIPE TO DODGE</div>
+  <div id="comboText"></div>
+</div>
+
+<div id="hitFlash"></div>
+<div id="gainFlash"></div>
+
+<div id="quizOverlay">
+  <div class="qo-top">
+    <div class="qo-badge">AI-901 QUIZ BREAK</div>
+    <div class="qo-title">Test your Azure AI knowledge</div>
+    <div class="qo-reward">Correct = +1 Life (max 5) · Wrong = No penalty</div>
+  </div>
+  <div id="qDomain"></div>
+  <div id="qText"></div>
+  <div id="qOpts"></div>
+  <div id="qExpl"><strong>Explanation</strong><span id="qExplText"></span></div>
+  <button id="qContinue">RESUME MISSION</button>
+</div>
+
+<div id="goScreen">
+  <div class="go-over">MISSION FAILED</div>
+  <div class="go-lbl">Final Score</div>
+  <div class="go-score" id="goScore">0</div>
+  <div class="go-grid">
+    <div class="go-stat"><div class="go-sv" id="goCorrect">0</div><div class="go-sl">Correct</div></div>
+    <div class="go-stat"><div class="go-sv" id="goTotal">0</div><div class="go-sl">Questions</div></div>
+    <div class="go-stat"><div class="go-sv" id="goTime">0s</div><div class="go-sl">Survived</div></div>
+    <div class="go-stat"><div class="go-sv" id="goHigh">0</div><div class="go-sl">Best Score</div></div>
+  </div>
+  <div class="go-acc" id="goAcc"></div>
+  <button class="go-btn" id="retryBtn">RETRY MISSION</button>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   QUIZ DATA
+════════════════════════════════════════════════════════════════ */
+const QS=[
+{dom:"AI Workloads & Responsible AI",q:"Which responsible AI principle requires that AI systems must NOT create or reinforce unfair bias against groups based on gender, age, or ethnicity?",o:["Reliability & Safety","Transparency","Fairness","Inclusiveness"],a:2,e:"Fairness ensures AI systems don't discriminate on protected characteristics — critical in high-stakes decisions like loan approvals, hiring, or parole."},
+{dom:"Generative AI & Foundry",q:"What is a Large Language Model (LLM)?",o:["A database storing labelled training data","A deep learning model trained on massive text that can understand and generate human-like text","A rule-based chatbot matching inputs to responses","A computer vision model for high-resolution images"],a:1,e:"LLMs like GPT-4 are Transformer-based models trained on vast text data. They can write, summarise, translate, and assist with coding without task-specific programming."},
+{dom:"Generative AI & Foundry",q:"What does 'hallucination' mean in the context of large language models?",o:["When the model generates text at unusually fast speed","When the model confidently generates factually incorrect or fabricated information","When content safety filters block a response","When the model produces identical outputs every time"],a:1,e:"Hallucination is when LLMs generate plausible-sounding but factually wrong or invented content — presented confidently as fact. RAG helps mitigate this."},
+{dom:"NLP & Language AI",q:"Which Azure AI service provides Sentiment Analysis for customer reviews?",o:["Azure AI Vision","Azure AI Custom Vision","Azure AI Translator","Azure AI Language"],a:3,e:"Azure AI Language provides Sentiment Analysis — returning positive/negative/neutral sentiment with confidence scores. It also supports Key Phrase Extraction and NER."},
+{dom:"Generative AI & Foundry",q:"What is Retrieval-Augmented Generation (RAG)?",o:["A technique to make LLMs run faster on GPU hardware","A pattern where relevant document chunks are retrieved and provided as context before generating a response","A fine-tuning method for domain-specific datasets","A content safety filter for blocking harmful outputs"],a:1,e:"RAG retrieves relevant passages from a vector knowledge base and injects them into the LLM prompt — grounding responses in verified documents and preventing hallucination."},
+{dom:"Generative AI & Foundry",q:"What does the 'temperature' parameter control in Azure OpenAI?",o:["The maximum tokens the model generates","The API request timeout in seconds","The randomness of output — lower = deterministic, higher = creative","The number of candidate completions generated"],a:2,e:"Temperature controls sampling randomness. Temperature=0 gives consistent outputs (great for factual tasks). Higher values produce more varied, creative responses."},
+{dom:"AI Workloads & Responsible AI",q:"Which principle requires that people must be able to understand and question AI decisions?",o:["Fairness","Privacy & Security","Transparency","Reliability & Safety"],a:2,e:"Transparency ensures AI systems are understandable and explainable. In high-stakes decisions, people have a right to understand why the AI decided as it did."},
+{dom:"Generative AI & Foundry",q:"What is Microsoft Foundry?",o:["A physical Microsoft datacenter for AI training","Microsoft's unified platform for building, evaluating, deploying and monitoring AI applications","A Python library for fine-tuning models locally","A Microsoft 365 feature adding AI to Word and Excel"],a:1,e:"Microsoft Foundry provides access to foundation models, prompt tools, Azure AI services, evaluation, deployment, and responsible AI features — all in one place."},
+{dom:"Generative AI & Foundry",q:"What is a 'token' in the context of large language models?",o:["A security credential for API authentication","A unit of text (roughly a word-piece) that LLMs process — used for pricing and context limits","A unique session identifier for each conversation","A model parameter updated during training"],a:1,e:"Tokens are the basic units LLMs process — roughly 1 token ≈ ¾ of an English word. Pricing and context window limits are measured in tokens."},
+{dom:"Computer Vision & Document AI",q:"Which Azure AI service extracts structured data from scanned forms and documents?",o:["Azure AI Vision","Azure AI Custom Vision","Azure AI Document Intelligence","Azure AI Face"],a:2,e:"Azure AI Document Intelligence extracts key-value pairs, tables, and fields from documents — with pre-built models for invoices, receipts, IDs, and custom models for unique layouts."},
+{dom:"Machine Learning",q:"What is 'overfitting' in machine learning?",o:["When the model is too simple to learn","When training data contains too many errors","When the model memorises training data and fails to generalise to new data","When the model runs out of GPU memory"],a:2,e:"Overfitting: high training accuracy but poor test performance. The model learned noise rather than patterns. Solutions: regularisation, cross-validation, more data."},
+{dom:"Machine Learning",q:"Which is an example of UNSUPERVISED machine learning?",o:["Training on labelled cat/dog images to classify photos","Using fraud-labelled transactions to detect fraud","Grouping customers into segments WITHOUT predefined labels","Predicting temperature from historical data"],a:2,e:"Unsupervised learning works on unlabelled data — it discovers patterns like customer clusters without being told what groups should look like."},
+{dom:"Generative AI & Foundry",q:"What is 'prompt engineering'?",o:["Fine-tuning a model on domain-specific data","Designing and refining text inputs to guide a generative AI toward desired output","Engineering infrastructure to serve models at scale","Converting model outputs into structured data"],a:1,e:"Prompt engineering uses clear instructions, few-shot examples, role assignment, and chain-of-thought to improve LLM output quality — without changing model weights."},
+{dom:"Generative AI & Foundry",q:"What is an AI agent in modern applications?",o:["A human reviewing AI outputs","A pre-trained model fine-tuned on domain data","An AI system that can reason about goals, use tools, and take multi-step autonomous actions","A monitoring dashboard for model performance"],a:2,e:"AI agents extend LLMs beyond single Q&A. They can search the web, call APIs, execute code, and operate autonomously to complete complex tasks."},
+{dom:"Generative AI & Foundry",q:"What does the 'system message' do in Azure OpenAI?",o:["Specifies maximum tokens","Provides the API key","Contains the user's question","Sets the persistent persona, behaviour, and constraints for the assistant"],a:3,e:"The system message instructs the AI's role, tone, and guardrails. It persists across all conversation turns."},
+{dom:"Computer Vision & Document AI",q:"Which task assigns a label to an ENTIRE image (e.g., 'Defective' or 'Non-Defective')?",o:["Object Detection","Semantic Segmentation","Image Classification","Optical Character Recognition"],a:2,e:"Image Classification assigns one label to the whole image. Object Detection locates items with bounding boxes. Segmentation labels each pixel."},
+{dom:"AI Workloads & Responsible AI",q:"Azure AI Content Safety's 'Prompt Shield' detects what type of attack?",o:["Harmful content like violence and hate speech","Grammatical errors in outputs","Prompt injection and jailbreak attacks","Factually incorrect responses"],a:2,e:"Prompt Shield detects direct attacks (jailbreaks trying to override system instructions) and indirect attacks (malicious instructions hidden in retrieved documents)."},
+{dom:"Machine Learning",q:"What is 'data drift' in deployed models?",o:["Training data errors causing poor initial performance","Statistical properties of production data changing over time, causing accuracy to decline","Retraining too frequently, forgetting earlier patterns","Different outputs for the same input due to randomness"],a:1,e:"Data drift: production data distribution shifts from training data. A 2022 model becomes less accurate as customer preferences change. Azure ML provides drift monitoring."},
+{dom:"NLP & Language AI",q:"Which Azure AI Language feature identifies entities like people, locations, and organisations?",o:["Sentiment Analysis","Language Detection","Key Phrase Extraction","Named Entity Recognition (NER)"],a:3,e:"NER identifies real-world entities — Person, Location, Organisation, Date — from unstructured text. Azure AI Language's NER also includes a Healthcare variant."},
+{dom:"Generative AI & Foundry",q:"What is Microsoft Copilot?",o:["A programming language for AI on Azure","A physical AI computing device","Microsoft's AI assistant integrated across Microsoft 365, Windows, Bing, and Azure using LLMs","A database service for training data"],a:2,e:"Microsoft Copilot is Microsoft's branded AI assistant powered by LLMs, appearing in Word, Excel, Teams, Outlook, Windows 11, GitHub, and Azure."}
+];
+
+/* ════════════════════════════════════════════════════════════════
+   OBSTACLE VISUALS (no text, no emojis)
+════════════════════════════════════════════════════════════════ */
+const OT=[
+{bg:'radial-gradient(circle at 35% 30%,#ff7744,#aa2200)',bd:'#ff5522',gw:'rgba(255,85,34,.5)',br:'42% 58% 35% 65%/55% 40% 60% 45%'},
+{bg:'linear-gradient(135deg,#ff6b35,#bb1800)',bd:'#ff4411',gw:'rgba(255,68,17,.5)',br:'15% 85% 15% 85%/85% 15% 85% 15%'},
+{bg:'linear-gradient(180deg,#e63946,#881122)',bd:'#cc2233',gw:'rgba(204,34,51,.5)',br:'20%'},
+{bg:'radial-gradient(circle at 45% 40%,#ff2266,#770022)',bd:'#ff0044',gw:'rgba(255,0,68,.6)',br:'50%'},
+{bg:'linear-gradient(45deg,#dd3355,#661133)',bd:'#bb2244',gw:'rgba(187,34,68,.5)',br:'30% 70% 50% 50%/50% 30% 70% 50%'}
+];
+
+/* ════════════════════════════════════════════════════════════════
+   DOM REFS
+════════════════════════════════════════════════════════════════ */
+const $gc=document.getElementById('gc');
+const $player=document.getElementById('player');
+const $scoreVal=document.getElementById('scoreVal');
+const $livesRow=document.getElementById('livesRow');
+const $qFill=document.getElementById('quizFill');
+const $qHint=document.getElementById('quizHint');
+const $qOver=document.getElementById('quizOverlay');
+const $qDomain=document.getElementById('qDomain');
+const $qText=document.getElementById('qText');
+const $qOpts=document.getElementById('qOpts');
+const $qExpl=document.getElementById('qExpl');
+const $qExplTxt=document.getElementById('qExplText');
+const $qCont=document.getElementById('qContinue');
+const $hitFlash=document.getElementById('hitFlash');
+const $gainFlash=document.getElementById('gainFlash');
+const $goScreen=document.getElementById('goScreen');
+const $startSc=document.getElementById('startScreen');
+const $loadSc=document.getElementById('loadScreen');
+const $speedBadge=document.getElementById('speedBadge');
+const $comboText=document.getElementById('comboText');
+const $swipeHint=document.getElementById('swipeHint');
+
+/* ════════════════════════════════════════════════════════════════
+   LAYOUT ENGINE
+   Set gc font-size so 1em = 1% of gc width.
+   All game elements use em units → scale with container.
+   Positioning done in px via getBoundingClientRect().
+════════════════════════════════════════════════════════════════ */
+function updateSizes(){
+  const w=$gc.offsetWidth;
+  $gc.style.fontSize=(w/100)+'px';
+}
+
+/* Get the X center of a lane in gc-local pixels */
+function getLaneCX(laneIdx){
+  return $gc.offsetWidth/3*(laneIdx+0.5);
+}
+
+/* Place player at center of current lane */
+function placePlayer(){
+  const cx=getLaneCX(lane);
+  const pw=$player.offsetWidth;
+  $player.style.left=(cx-pw/2)+'px';
+}
+
+/* ════════════════════════════════════════════════════════════════
+   GAME STATE
+════════════════════════════════════════════════════════════════ */
+let running=false,paused=false;
+let lane=1,lives=3,score=0,highScore=0;
+let gameTime=0,quizClock=0;
+let speedMul=1,spawnTimer=0,spawnInterval=1800;
+let invincible=false,lastTS=null,rafId=null;
+let totalQ=0,correctQ=0,usedQ=[];
+const QUIZ_INTERVAL=30000,MAX_LIVES=5,MAX_OBS=10;
+
+/* ════════════════════════════════════════════════════════════════
+   STAR FIELD GENERATION
+════════════════════════════════════════════════════════════════ */
+function genStarCSS(count,maxOp){
+  const p=[];
+  for(let i=0;i<count;i++){
+    const x=(Math.random()*100).toFixed(1);
+    const y=(Math.random()*100).toFixed(1);
+    const o=(.15+Math.random()*maxOp).toFixed(2);
+    p.push(`radial-gradient(1px 1px at ${x}% ${y}%,rgba(255,255,255,${o}),transparent)`);
+  }
+  return p.join(',');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   OBSTACLE POOL
+════════════════════════════════════════════════════════════════ */
+const pool=[];
+function mkObs(){
+  const el=document.createElement('div');
+  el.className='obs';el.style.display='none';
+  $gc.appendChild(el);
+  return{el,lane:0,y:0,active:false,hit:false};
+}
+function initPool(){for(let i=0;i<MAX_OBS;i++)pool.push(mkObs())}
+function getFree(){return pool.find(o=>!o.active)||null}
+
+function spawnObs(){
+  const o=getFree();if(!o)return;
+  const t=OT[Math.floor(Math.random()*OT.length)];
+  o.lane=Math.floor(Math.random()*3);
+  o.y=-$gc.offsetHeight*0.12; // start above screen
+  o.active=true;o.hit=false;
+  const cx=getLaneCX(o.lane);
+  const ow=o.el.offsetWidth;
+  o.el.style.cssText=`display:block;left:${cx-ow/2}px;width:11em;height:11em;top:0;
+    background:${t.bg};border:1.5px solid ${t.bd};border-radius:${t.br};
+    box-shadow:0 0 3em ${t.gw},0 0 6em ${t.gw},inset 0 0 2em ${t.gw};
+    transform:translateY(${o.y}px);`;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PLAYER CONTROLS
+════════════════════════════════════════════════════════════════ */
+function mvLeft(){if(!running||paused||lane<=0)return;lane--;placePlayer()}
+function mvRight(){if(!running||paused||lane>=2)return;lane++;placePlayer()}
+
+/* ════════════════════════════════════════════════════════════════
+   LIVES UI
+════════════════════════════════════════════════════════════════ */
+function drawLives(){
+  $livesRow.innerHTML='';
+  for(let i=0;i<MAX_LIVES;i++){
+    const s=document.createElement('span');
+    s.className='lheart'+(i>=lives?' gone':'');
+    s.textContent='❤️';$livesRow.appendChild(s);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   COLLISION — getBoundingClientRect like the old game
+════════════════════════════════════════════════════════════════ */
+function checkColl(){
+  if(invincible)return;
+  const pr=$player.getBoundingClientRect();
+  for(const o of pool){
+    if(!o.active||o.hit)continue;
+    const or_=o.el.getBoundingClientRect();
+    if(or_.left<pr.right&&or_.right>pr.left&&or_.top<pr.bottom&&or_.bottom>pr.top){
+      o.hit=true;o.active=false;o.el.style.display='none';
+      onHit();return;
+    }
+  }
+}
+
+function onHit(){
+  lives--;drawLives();shakeGame();flashRed();
+  /* Particle position in gc-local coords */
+  const pr=$player.getBoundingClientRect();
+  const gr=$gc.getBoundingClientRect();
+  spawnParticles(pr.left+pr.width/2-gr.left,pr.top+pr.height/2-gr.top,'#ff1a6b');
+  if(lives<=0){setTimeout(endGame,500);return}
+  invincible=true;$player.classList.add('inv');
+  setTimeout(()=>{invincible=false;$player.classList.remove('inv')},1400);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   EFFECTS
+════════════════════════════════════════════════════════════════ */
+let shakeTO=null;
+function shakeGame(){
+  const seq=['translate(5px,-3px)','translate(-5px,3px)','translate(3px,5px)','translate(-3px,-5px)','translate(0,0)'];
+  let i=0;clearTimeout(shakeTO);
+  const n=()=>{if(i>=seq.length){$gc.style.transform='translateX(-50%)';return}
+    $gc.style.transform=`translateX(-50%) ${seq[i++]}`;shakeTO=setTimeout(n,60)};
+  n();
+}
+function flashRed(){$hitFlash.style.opacity='1';setTimeout(()=>$hitFlash.style.opacity='0',140)}
+function flashGreen(){$gainFlash.style.opacity='1';setTimeout(()=>$gainFlash.style.opacity='0',400)}
+
+function spawnParticles(cx,cy,color){
+  for(let i=0;i<10;i++){
+    const p=document.createElement('div');p.className='part';
+    const ang=(i/10)*Math.PI*2,dist=4+Math.random()*7,sz=1.5+Math.random()*1.5;
+    p.style.cssText=`left:${cx}px;top:${cy}px;width:${sz}em;height:${sz}em;
+      background:${color};box-shadow:0 0 ${sz}em ${color};
+      --tx:${(Math.cos(ang)*dist).toFixed(1)}em;--ty:${(Math.sin(ang)*dist).toFixed(1)}em;`;
+    $gc.appendChild(p);setTimeout(()=>p.remove(),600);
+  }
+}
+
+function showCombo(txt,color){
+  $comboText.textContent=txt;$comboText.style.color=color;
+  $comboText.style.textShadow=`0 0 3em ${color}`;
+  $comboText.style.opacity='1';setTimeout(()=>$comboText.style.opacity='0',900);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   QUIZ SYSTEM
+════════════════════════════════════════════════════════════════ */
+function pickQ(){
+  if(usedQ.length>=QS.length)usedQ=[];
+  const avail=QS.map((_,i)=>i).filter(i=>!usedQ.includes(i));
+  const idx=avail[Math.floor(Math.random()*avail.length)];
+  usedQ.push(idx);return{...QS[idx],_i:idx};
+}
+function showQuiz(){
+  paused=true;totalQ++;
+  const q=pickQ();
+  $qDomain.textContent=q.dom;$qText.textContent=q.q;
+  $qOpts.innerHTML='';$qExpl.classList.remove('show');$qExplTxt.textContent='';
+  $qCont.classList.remove('show');$qOver.classList.add('show');
+  const L=['A','B','C','D'];
+  q.o.forEach((opt,i)=>{
+    const d=document.createElement('div');d.className='qopt';
+    d.innerHTML=`<div class="qltr">${L[i]}</div><div>${opt}</div>`;
+    d.addEventListener('click',()=>{if(d.classList.contains('dis'))return;onQuizAnswer(i,q.a,q.e)});
+    $qOpts.appendChild(d);
+  });
+}
+function onQuizAnswer(sel,correct,expl){
+  const opts=$qOpts.querySelectorAll('.qopt');
+  opts.forEach(o=>o.classList.add('dis'));
+  if(sel===correct){
+    opts[sel].classList.add('hit-ok');correctQ++;
+    if(lives<MAX_LIVES){lives++;drawLives();flashGreen();showCombo('+1 LIFE','var(--green)');
+      const gr=$gc.getBoundingClientRect();spawnParticles(gr.width/2,gr.height/2,'#22c55e')}
+    else showCombo('PERFECT','var(--yellow)');
+  }else{opts[sel].classList.add('hit-bad');opts[correct].classList.add('reveal-ok');showCombo('KEEP STUDYING','#f87171')}
+  $qExplTxt.textContent=expl;$qExpl.classList.add('show');$qCont.classList.add('show');
+}
+ $qCont.addEventListener('click',()=>{
+  $qOver.classList.remove('show');paused=false;quizClock=0;
+  $qFill.style.width='100%';$qHint.classList.remove('vis');
+  invincible=true;$player.classList.add('inv');
+  setTimeout(()=>{invincible=false;$player.classList.remove('inv')},1000);
+});
+
+/* ════════════════════════════════════════════════════════════════
+   GAME LOOP — pixel-based movement, like the old game
+════════════════════════════════════════════════════════════════ */
+function loop(ts){
+  if(!running)return;
+  if(!lastTS)lastTS=ts;
+  const dt=Math.min((ts-lastTS)/1000,.05); // seconds, capped
+  lastTS=ts;
+
+  if(!paused){
+    gameTime+=dt;quizClock+=dt*1000;
+    speedMul=Math.min(1+Math.floor(gameTime/10)*.08,2.8);
+    spawnInterval=Math.max(650,1800/speedMul);
+    score+=dt*12*speedMul;
+    $scoreVal.textContent=Math.floor(score).toLocaleString();
+    $speedBadge.textContent=`×${speedMul.toFixed(1)}`;
+
+    spawnTimer+=dt*1000;
+    if(spawnTimer>=spawnInterval){
+      spawnTimer=0;spawnObs();
+      if(speedMul>1.5&&Math.random()<.25)setTimeout(spawnObs,200);
+    }
+
+    /* Speed proportional to container height — same feel on any screen */
+    const gcH=$gc.offsetHeight;
+    const spd=gcH*0.42*speedMul; // px per second
+    for(const o of pool){
+      if(!o.active)continue;
+      o.y+=spd*dt;
+      o.el.style.transform=`translateY(${o.y}px)`;
+      if(o.y>gcH+60){o.active=false;o.el.style.display='none'}
+    }
+
+    checkColl();
+
+    const ratio=1-quizClock/QUIZ_INTERVAL;
+    $qFill.style.width=Math.max(0,ratio*100)+'%';
+    if(quizClock>QUIZ_INTERVAL-6000)$qHint.classList.add('vis');
+    if(quizClock>=QUIZ_INTERVAL)showQuiz();
+  }
+  rafId=requestAnimationFrame(loop);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   START / END
+════════════════════════════════════════════════════════════════ */
+function startGame(){
+  updateSizes();
+  lane=1;lives=3;score=0;gameTime=0;
+  quizClock=0;speedMul=1;spawnTimer=0;
+  invincible=false;lastTS=null;usedQ=[];
+  totalQ=0;correctQ=0;
+  for(const o of pool){o.active=false;o.hit=false;o.el.style.display='none'}
+  drawLives();$scoreVal.textContent='0';
+  $qFill.style.width='100%';$qHint.classList.remove('vis');
+  $player.classList.remove('inv');$comboText.style.opacity='0';
+  $startSc.style.opacity='0';setTimeout(()=>$startSc.style.display='none',400);
+  $goScreen.classList.remove('show');$qOver.classList.remove('show');
+  placePlayer();running=true;paused=false;
+  invincible=true;$player.classList.add('inv');
+  setTimeout(()=>{invincible=false;$player.classList.remove('inv')},1200);
+  if(rafId)cancelAnimationFrame(rafId);
+  rafId=requestAnimationFrame(loop);
+}
+
+function endGame(){
+  running=false;paused=false;
+  if(rafId){cancelAnimationFrame(rafId);rafId=null}
+  const fs=Math.floor(score);if(fs>highScore)highScore=fs;
+  document.getElementById('goScore').textContent=fs.toLocaleString();
+  document.getElementById('goCorrect').textContent=correctQ;
+  document.getElementById('goTotal').textContent=totalQ;
+  document.getElementById('goTime').textContent=Math.floor(gameTime)+'s';
+  document.getElementById('goHigh').textContent=highScore.toLocaleString();
+  const acc=totalQ>0?Math.round(correctQ/totalQ*100):0;
+  document.getElementById('goAcc').textContent=totalQ>0?`Quiz accuracy: ${correctQ}/${totalQ} (${acc}%)`:'No quiz questions answered';
+  setTimeout(()=>$goScreen.classList.add('show'),300);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CONTROLS — passive touch (no preventDefault!)
+════════════════════════════════════════════════════════════════ */
+let txStart=0,tyStart=0;
+document.addEventListener('touchstart',e=>{txStart=e.touches[0].clientX;tyStart=e.touches[0].clientY},{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-txStart;
+  const dy=e.changedTouches[0].clientY-tyStart;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>28)dx>0?mvRight():mvLeft();
+},{passive:true});
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')mvLeft();
+  if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')mvRight();
+});
+document.getElementById('startBtn').addEventListener('click',startGame);
+document.getElementById('retryBtn').addEventListener('click',startGame);
+
+/* ════════════════════════════════════════════════════════════════
+   SCREEN GUARD — triggers when viewport is too short to play
+════════════════════════════════════════════════════════════════ */
+const $sg=document.getElementById('screenGuard');
+function checkScreen(){$sg.classList.toggle('show',window.innerHeight<420)}
+window.addEventListener('resize',checkScreen);
+window.addEventListener('orientationchange',()=>setTimeout(checkScreen,200));
+
+/* ════════════════════════════════════════════════════════════════
+   RESIZE — recalc sizes + reposition active elements
+════════════════════════════════════════════════════════════════ */
+window.addEventListener('resize',()=>{
+  checkScreen();updateSizes();
+  if(running){
+    placePlayer();
+    for(const o of pool){
+      if(o.active){
+        const cx=getLaneCX(o.lane);
+        o.el.style.left=(cx-o.el.offsetWidth/2)+'px';
+      }
+    }
+  }
+  /* Show/hide swipe hint based on touch capability */
+  $swipeHint.style.display=('ontouchstart' in window)?'':'none';
+});
+
+/* ════════════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════════════ */
+window.addEventListener('load',()=>{
+  document.getElementById('starsFar').style.backgroundImage=genStarCSS(160,.5);
+  document.getElementById('starsNear').style.backgroundImage=genStarCSS(80,.9);
+  initPool();updateSizes();checkScreen();
+  $swipeHint.style.display=('ontouchstart' in window)?'':'none';
+  setTimeout(()=>{
+    $loadSc.classList.add('out');
+    setTimeout(()=>$loadSc.style.display='none',700);
+  },950);
+});
+</script>
+</body>
+</html>
