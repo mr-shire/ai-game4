@@ -4,57 +4,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" "black-translucent">
 <title>AI-901 Runner</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --cyan:#00e5ff;--cyan2:#00b8d9;--pink:#ff1a6b;--purple:#a855f7;
+  --cyan:#00e5ff;--cyan2:#00b8d9;--cyanD:#0077b6;
+  --pink:#ff1a6b;--purple:#a855f7;
   --green:#22c55e;--yellow:#fbbf24;--bg:#020610;
 }
-html,body{
-  width:100%;height:100%;overflow:hidden;
-  background:radial-gradient(ellipse at 50% 40%,#0a1628,#020610 70%);
-  color:#e2e8f0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
-  -webkit-tap-highlight-color:transparent;user-select:none;touch-action:none;
-}
+html,body{width:100%;height:100%;overflow:hidden;
+  background:#000;color:#e2e8f0;
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  -webkit-tap-highlight-color:transparent;user-select:none;touch-action:none}
 
-#screenGuard{
-  display:none;position:fixed;inset:0;z-index:9999;
-  background:var(--bg);align-items:center;justify-content:center;
-  flex-direction:column;gap:16px;text-align:center;padding:24px;
-}
+#screenGuard{display:none;position:fixed;inset:0;z-index:9999;background:var(--bg);
+  align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:24px}
 #screenGuard.show{display:flex}
 #screenGuard .sg-icon{font-size:48px}
 #screenGuard .sg-text{font-size:16px;color:var(--cyan);letter-spacing:2px;max-width:320px}
 
-#loadScreen{
-  position:fixed;inset:0;z-index:5000;background:var(--bg);
+#loadScreen{position:fixed;inset:0;z-index:5000;background:var(--bg);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
-  font-size:16px;transition:opacity .6s;
-}
+  font-size:16px;transition:opacity .6s}
 #loadScreen.out{opacity:0;pointer-events:none}
-.ls-logo{
-  font-size:clamp(32px,12vw,72px);font-weight:900;letter-spacing:8px;
+.ls-logo{font-size:clamp(32px,12vw,72px);font-weight:900;letter-spacing:8px;
   background:linear-gradient(135deg,var(--cyan),var(--purple));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  filter:drop-shadow(0 0 8px rgba(0,229,255,.5));
-  animation:lsPulse 1.2s ease-in-out infinite alternate;
-}
-@keyframes lsPulse{from{filter:drop-shadow(0 0 8px rgba(0,229,255,.4))}to{filter:drop-shadow(0 0 24px rgba(0,229,255,.9))}}
+  filter:drop-shadow(0 0 12px rgba(0,229,255,.6));animation:lsPulse 1.2s ease-in-out infinite alternate}
+@keyframes lsPulse{from{filter:drop-shadow(0 0 8px rgba(0,229,255,.4))}to{filter:drop-shadow(0 0 28px rgba(0,229,255,1))}}
 .ls-sub{font-size:clamp(10px,3.5vw,14px);color:rgba(0,229,255,.5);letter-spacing:12px;text-transform:uppercase}
 .ls-bar{width:min(40vw,200px);height:2px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
 .ls-bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:2px;animation:lsLoad .9s ease-out forwards;width:0}
 @keyframes lsLoad{to{width:100%}}
 
-#startScreen{
-  position:fixed;inset:0;z-index:2000;
+#startScreen{position:fixed;inset:0;z-index:2000;
   background:linear-gradient(180deg,var(--bg),#060e1e 50%,var(--bg));
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:24px;gap:16px;overflow-y:auto;font-size:16px;
-  touch-action:pan-y;-webkit-overflow-scrolling:touch;
-  transition:opacity .4s;
-}
+  touch-action:pan-y;-webkit-overflow-scrolling:touch;transition:opacity .4s}
 #startScreen.out{opacity:0;pointer-events:none}
 .ss-badge{font-size:clamp(10px,2.8vw,14px);color:var(--cyan);text-transform:uppercase;letter-spacing:8px;
   border:1px solid rgba(0,229,255,.25);border-radius:20px;padding:6px 16px;background:rgba(0,229,255,.04);
@@ -62,177 +50,281 @@ html,body{
 .ss-title{font-size:clamp(28px,9vw,56px);font-weight:900;text-align:center;line-height:1.1;letter-spacing:-2px;
   background:linear-gradient(135deg,var(--cyan),#7dd3fc 40%,var(--purple));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  filter:drop-shadow(0 0 12px rgba(0,229,255,.3))}
+  filter:drop-shadow(0 0 16px rgba(0,229,255,.4))}
 .ss-sub{font-size:clamp(13px,3.5vw,18px);color:rgba(125,211,252,.7);text-align:center;line-height:1.5;max-width:480px}
-.ss-rules{
-  width:100%;max-width:480px;background:rgba(0,229,255,.03);
+.ss-rules{width:100%;max-width:480px;background:rgba(0,229,255,.03);
   border:1px solid rgba(0,229,255,.12);border-radius:14px;padding:16px 20px;
   display:flex;flex-direction:column;gap:12px}
 .ss-rule{display:flex;align-items:flex-start;gap:14px;font-size:clamp(13px,3.3vw,15px);color:rgba(203,213,225,.8);line-height:1.5}
 .ss-rule-icon{font-size:clamp(18px,5.5vw,24px);flex-shrink:0}
 .ss-rule strong{color:#e2e8f0}
-.ss-btn{
-  padding:14px 48px;
+.ss-btn{padding:14px 48px;
   background:linear-gradient(135deg,var(--cyan),var(--cyan2));
   color:#fff;border:none;border-radius:14px;
   font-size:clamp(18px,5.5vw,24px);font-weight:800;letter-spacing:2px;cursor:pointer;
-  box-shadow:0 0 20px rgba(0,229,255,.4),0 0 50px rgba(0,229,255,.15);
+  box-shadow:0 0 24px rgba(0,229,255,.5),0 0 60px rgba(0,229,255,.15);
   animation:ssPulse 2s ease-in-out infinite;transition:transform .1s;
-  text-transform:uppercase;touch-action:none;
-}
+  text-transform:uppercase;touch-action:none}
 .ss-btn:active{transform:scale(.96)}
-@keyframes ssPulse{0%,100%{box-shadow:0 0 20px rgba(0,229,255,.4)}50%{box-shadow:0 0 35px rgba(0,229,255,.7),0 0 70px rgba(0,229,255,.25)}}
+@keyframes ssPulse{0%,100%{box-shadow:0 0 24px rgba(0,229,255,.5)}50%{box-shadow:0 0 40px rgba(0,229,255,.8),0 0 80px rgba(0,229,255,.3)}}
 .ss-controls{font-size:clamp(11px,2.8vw,14px);color:rgba(100,116,139,.5);text-align:center;line-height:1.8}
 
-/* ─── GAME CONTAINER ──────────────────────────────────────────── */
-#gc{
-  position:fixed;left:50%;transform:translateX(-50%);
+/* ─── GAME CONTAINER ──────────────────────────────────────── */
+#gc{position:fixed;left:50%;transform:translateX(-50%);
   width:min(100vw,480px);height:100vh;overflow:hidden;
-  background:linear-gradient(180deg,#020610,#040c1a 40%,#06101f);
-  touch-action:none;
-}
+  background:linear-gradient(180deg,#010409,#030a18 35%,#051020 65%,#020810);
+  touch-action:none}
 
-/* ─── TAP ZONE INDICATORS ─────────────────────────────────────── */
-.tap-zone{
-  position:absolute;top:0;bottom:0;width:50%;z-index:60;
-  display:flex;align-items:center;justify-content:center;
-  pointer-events:none;opacity:0;transition:opacity .15s;
-}
-.tap-zone.vis{opacity:1}
-.tap-zone-l{left:0}
-.tap-zone-r{right:0}
-.tap-zone-icon{
-  width:8em;height:8em;border-radius:50%;
-  border:2px solid rgba(0,229,255,.15);
-  background:rgba(0,229,255,.03);
-  display:flex;align-items:center;justify-content:center;
-  font-size:3.5em;color:rgba(0,229,255,.2);
-  transition:all .1s;
-}
-.tap-zone.flash .tap-zone-icon{
-  border-color:rgba(0,229,255,.4);
-  background:rgba(0,229,255,.08);
-  color:rgba(0,229,255,.5);
-  transform:scale(.92);
-}
+/* ─── VIGNETTE ────────────────────────────────────────────── */
+#vignette{position:absolute;inset:0;pointer-events:none;z-index:90;
+  background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(0,0,0,.5) 100%)}
 
-/* ─── STARS ───────────────────────────────────────────────────── */
-#starsFar,#starsNear{position:absolute;inset:0;pointer-events:none;background-repeat:repeat;background-size:100% 100%}
-#starsFar{animation:starDrift 50s linear infinite;opacity:.7}
-#starsNear{animation:starDrift 30s linear infinite}
+/* ─── STARS ───────────────────────────────────────────────── */
+#starsFar,#starsNear,#starsBright{position:absolute;inset:0;pointer-events:none;
+  background-repeat:repeat;background-size:100% 100%}
+#starsFar{animation:starDrift 40s linear infinite;opacity:.6}
+#starsNear{animation:starDrift 22s linear infinite}
+#starsBright{animation:starTwinkle 4s ease-in-out infinite alternate}
 @keyframes starDrift{from{background-position:0 0}to{background-position:0 100%}}
-#nebula{position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse at 15% 75%,rgba(0,80,200,.07),transparent 50%),
-  radial-gradient(ellipse at 85% 25%,rgba(100,0,180,.05),transparent 45%),
-  radial-gradient(ellipse at 50% 10%,rgba(0,150,200,.04),transparent 40%)}
-#spaceGlow{position:absolute;left:0;right:0;bottom:0;height:15%;pointer-events:none;
-  background:linear-gradient(0deg,rgba(0,100,200,.06),transparent)}
+@keyframes starTwinkle{0%{opacity:.3}100%{opacity:.9}}
 
+/* ─── NEBULA ──────────────────────────────────────────────── */
+#nebula{position:absolute;inset:0;pointer-events:none;
+  background:
+  radial-gradient(ellipse at 10% 80%,rgba(0,60,180,.08),transparent 45%),
+  radial-gradient(ellipse at 90% 15%,rgba(120,0,200,.06),transparent 40%),
+  radial-gradient(ellipse at 50% 50%,rgba(0,120,180,.03),transparent 55%),
+  radial-gradient(ellipse at 70% 70%,rgba(180,0,80,.03),transparent 35%)}
+
+/* ─── AMBIENT DUST ────────────────────────────────────────── */
+#dust{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.dust-p{position:absolute;width:2px;height:2px;border-radius:50%;
+  background:rgba(0,229,255,.15);animation:dustFloat linear infinite}
+@keyframes dustFloat{0%{transform:translateY(0) translateX(0);opacity:0}
+  10%{opacity:1}90%{opacity:1}100%{transform:translateY(100vh) translateX(20px);opacity:0}}
+
+/* ─── LANE LINES (animated dashes) ────────────────────────── */
 .lane-line{position:absolute;top:8%;bottom:0;width:1px;
-  background:linear-gradient(180deg,transparent,rgba(0,229,255,.06) 10%,rgba(0,229,255,.12) 50%,rgba(0,229,255,.06) 90%,transparent)}
-.lane-line::before{content:'';position:absolute;top:0;bottom:0;left:-2px;width:5px;background:inherit;filter:blur(3px);opacity:.4}
+  background:repeating-linear-gradient(180deg,
+    rgba(0,229,255,.04) 0px,rgba(0,229,255,.15) 8px,rgba(0,229,255,.04) 16px);
+  animation:laneScroll .8s linear infinite}
+.lane-line::before{content:'';position:absolute;top:0;bottom:0;left:-3px;width:7px;
+  background:inherit;filter:blur(4px);opacity:.35}
+@keyframes laneScroll{from{background-position:0 0}to{background-position:0 16px}}
 #ll1{left:33.333%}#ll2{left:66.666%}
 
-/* ─── MRMAKES ─────────────────────────────────────────────────── */
-#player{
-  position:absolute;bottom:5%;width:14em;
-  will-change:left;transition:left .1s cubic-bezier(.25,.8,.25,1);
-  animation:spaceHover 2.5s ease-in-out infinite;z-index:50;
-  filter:drop-shadow(0 0 3em rgba(0,229,255,.4));
-}
+#spaceGlow{position:absolute;left:0;right:0;bottom:0;height:18%;pointer-events:none;
+  background:linear-gradient(0deg,rgba(0,80,180,.08),transparent)}
+
+/* ─── TAP ZONES ──────────────────────────────────────────── */
+.tap-zone{position:absolute;top:0;bottom:0;width:50%;z-index:60;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;opacity:0;transition:opacity .2s}
+.tap-zone.vis{opacity:1}
+.tap-zone-l{left:0}.tap-zone-r{right:0}
+.tap-zone-icon{width:9em;height:9em;border-radius:50%;
+  border:1.5px solid rgba(0,229,255,.12);
+  background:rgba(0,229,255,.02);
+  display:flex;align-items:center;justify-content:center;
+  font-size:4em;color:rgba(0,229,255,.15);
+  transition:all .08s}
+.tap-zone.flash .tap-zone-icon{
+  border-color:rgba(0,229,255,.45);background:rgba(0,229,255,.1);
+  color:rgba(0,229,255,.6);transform:scale(.9);
+  box-shadow:0 0 20px rgba(0,229,255,.15)}
+
+/* ═══════════════════════════════════════════════════════════
+   MRMAKES — Enhanced Astronaut
+════════════════════════════════════════════════════════════ */
+#player{position:absolute;bottom:5%;width:16em;
+  will-change:left;transition:left .09s cubic-bezier(.2,.9,.3,1);
+  animation:spaceHover 2.8s ease-in-out infinite;z-index:50;
+  filter:drop-shadow(0 0 4em rgba(0,229,255,.35))}
 #player.inv::after{content:'';position:absolute;inset:-3em;border-radius:50%;
-  background:var(--bg);animation:invBlink .2s linear infinite;pointer-events:none;z-index:99}
-@keyframes invBlink{0%,100%{opacity:0}50%{opacity:.75}}
-@keyframes spaceHover{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.2em)}}
+  background:var(--bg);animation:invBlink .18s linear infinite;pointer-events:none;z-index:99}
+@keyframes invBlink{0%,100%{opacity:0}50%{opacity:.8}}
+@keyframes spaceHover{0%,100%{transform:translateY(0) rotate(-.3deg)}50%{transform:translateY(-1.5em) rotate(.3deg)}}
 
-.jp-tank{position:absolute;width:2.4em;height:7.5em;
-  background:linear-gradient(90deg,#6a6a7a,#9a9aaa,#7a7a8a);border-radius:1.2em;
-  top:4.5em;z-index:1;box-shadow:0 0 1em rgba(0,180,216,.2)}
-.jp-tank::before{content:'';position:absolute;top:-.6em;left:.3em;right:.3em;height:1em;
-  background:linear-gradient(180deg,#888,#aaa);border-radius:.5em .5em 0 0}
-.jp-tank::after{content:'';position:absolute;bottom:-.3em;left:.2em;right:.2em;height:.6em;
-  background:#555;border-radius:0 0 .8em .8em}
-.jp-l{left:-.8em}.jp-r{right:-.8em}
-.jp-flame{position:absolute;width:1.8em;top:11.5em;z-index:1;
-  background:linear-gradient(180deg,var(--cyan),#0066cc,rgba(0,80,200,0));
-  border-radius:0 0 50% 50%;filter:blur(1.5px);animation:thrustFlicker .1s ease-in-out infinite alternate}
-.jp-fl{left:.2em}.jp-fr{right:.2em}
-@keyframes thrustFlicker{0%{height:3em;opacity:.6}100%{height:5.5em;opacity:1}}
+/* Jetpack assembly */
+.jp-assembly{position:absolute;top:3em;left:-1.4em;right:-1.4em;height:10em;z-index:0;
+  display:flex;justify-content:space-between}
+.jp-unit{width:2.8em;position:relative}
+.jp-tank{width:100%;height:100%;
+  background:linear-gradient(90deg,#505068,#70708a 30%,#8888a0 50%,#70708a 70%,#505068);
+  border-radius:1.4em;
+  box-shadow:inset 0 0 1em rgba(0,0,0,.3),0 0 .5em rgba(0,180,216,.15)}
+/* Tank cap */
+.jp-tank::before{content:'';position:absolute;top:-.8em;left:.4em;right:.4em;height:1.2em;
+  background:linear-gradient(180deg,#999,#bbb,#888);border-radius:.6em .6em 0 0;
+  box-shadow:0 -.2em .3em rgba(255,255,255,.1)}
+/* Tank bottom nozzle */
+.jp-tank::after{content:'';position:absolute;bottom:-.5em;left:.6em;right:.6em;height:.8em;
+  background:linear-gradient(180deg,#444,#666);border-radius:0 0 1em 1em}
+/* Tank bands */
+.jp-band{position:absolute;left:0;right:0;height:.35em;
+  background:linear-gradient(90deg,rgba(0,180,216,.3),rgba(0,229,255,.5),rgba(0,180,216,.3))}
+.jp-band-1{top:25%}.jp-band-2{top:55%}.jp-band-3{top:80%}
+/* Connector to suit */
+.jp-connector{position:absolute;top:-.5em;left:50%;transform:translateX(-50%);
+  width:1.2em;height:1em;background:#606078;border-radius:.3em;
+  box-shadow:0 0 .3em rgba(0,180,216,.2)}
 
-.helmet{width:10.5em;height:9.5em;margin:0 auto .5em;
-  background:linear-gradient(180deg,#e8e8f0,#c8c8d8);border-radius:48% 48% 42% 42%;
-  position:relative;z-index:2;box-shadow:0 .3em 1em rgba(0,0,0,.3),0 0 1.5em rgba(200,200,220,.15)}
-.helmet::before{content:'';position:absolute;top:.3em;left:1.5em;right:1.5em;height:.6em;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);border-radius:50%}
-.visor{position:absolute;top:1.5em;left:1.8em;right:1.8em;bottom:1em;
-  background:linear-gradient(180deg,#00b4d8,#0077b6,#005f8a);border-radius:40% 40% 44% 44%;
-  box-shadow:0 0 3em rgba(0,180,216,.5),inset 0 0 2em rgba(0,229,255,.25),inset 0 -.5em 1em rgba(0,0,0,.2);overflow:hidden}
-.visor::before{content:'';position:absolute;top:15%;left:10%;width:30%;height:20%;
-  background:linear-gradient(180deg,rgba(255,255,255,.15),transparent);border-radius:50%;transform:rotate(-15deg)}
-.holo{position:absolute;color:rgba(255,255,255,.55);text-shadow:0 0 3px rgba(0,229,255,.7);
-  animation:holoFloat 3s ease-in-out infinite;pointer-events:none}
-.holo-1{top:22%;left:18%;font-size:2em;animation-delay:0s}
-.holo-2{top:50%;left:52%;font-size:1.6em;animation-delay:1s}
-.holo-3{top:28%;left:62%;font-size:1.8em;animation-delay:2s}
-@keyframes holoFloat{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-.6em);opacity:.85}}
+/* Thruster flames — triple layered for depth */
+.jp-flame-wrap{position:absolute;bottom:-1.2em;left:50%;transform:translateX(-50%);
+  display:flex;gap:.2em}
+.jp-flame{border-radius:0 0 50% 50%;filter:blur(1px)}
+.jp-flame-outer{width:2.2em;height:6em;
+  background:linear-gradient(180deg,rgba(0,180,255,.4),rgba(0,80,200,.15),transparent);
+  animation:flameOuter .1s ease-in-out infinite alternate}
+.jp-flame-mid{width:1.6em;height:5em;margin-top:-.5em;
+  background:linear-gradient(180deg,rgba(0,229,255,.7),rgba(0,150,255,.3),transparent);
+  animation:flameMid .08s ease-in-out infinite alternate}
+.jp-flame-core{width:.8em;height:3.5em;margin-top:-.3em;
+  background:linear-gradient(180deg,rgba(200,240,255,.9),rgba(0,229,255,.5),transparent);
+  animation:flameCore .06s ease-in-out infinite alternate}
+@keyframes flameOuter{0%{height:5em;opacity:.5}100%{height:7em;opacity:.8}}
+@keyframes flameMid{0%{height:4em;opacity:.6}100%{height:6em;opacity:1}}
+@keyframes flameCore{0%{height:3em;opacity:.7}100%{height:4.5em;opacity:1}}
 
-.suit-body{width:11.5em;height:8.5em;margin:0 auto;
-  background:linear-gradient(180deg,#f0f0f5,#d8d8e2);border-radius:22% 22% 14% 14%;
-  position:relative;z-index:2;border:.3em solid rgba(0,180,216,.25);
-  box-shadow:0 0 2em rgba(0,180,216,.1)}
-.suit-body::before{content:'';position:absolute;top:0;left:0;right:0;height:.45em;
-  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
-  box-shadow:0 0 4px var(--cyan),0 0 8px rgba(0,229,255,.3)}
-.suit-body::after{content:'';position:absolute;top:.6em;bottom:.6em;left:50%;width:.2em;
-  background:rgba(0,180,216,.15);transform:translateX(-50%)}
+/* Helmet — more detailed */
+.helmet{width:12em;height:10.5em;margin:0 auto .3em;
+  background:linear-gradient(160deg,#f4f4fa 0%,#d8d8e4 40%,#c0c0d0 100%);
+  border-radius:50% 50% 44% 44%;
+  position:relative;z-index:2;
+  box-shadow:
+    0 .4em 1.2em rgba(0,0,0,.35),
+    0 0 .5em rgba(200,210,230,.15),
+    inset 0 -.5em 1em rgba(0,0,0,.1)}
+/* Top highlight */
+.helmet::before{content:'';position:absolute;top:.5em;left:2em;right:2em;height:.7em;
+  background:linear-gradient(90deg,transparent 10%,rgba(255,255,255,.5) 40%,rgba(255,255,255,.5) 60%,transparent 90%);
+  border-radius:50%}
+/* Side shadow */
+.helmet::after{content:'';position:absolute;top:1em;bottom:2em;left:.5em;width:1em;
+  background:linear-gradient(90deg,rgba(0,0,0,.08),transparent);border-radius:50%}
+
+/* Visor — deeper, richer Azure glow */
+.visor{position:absolute;top:1.8em;left:2em;right:2em;bottom:1.2em;
+  background:linear-gradient(170deg,#00d4f8 0%,#0099cc 30%,#006d99 60%,#004d73 100%);
+  border-radius:42% 42% 46% 46%;
+  box-shadow:
+    0 0 4em rgba(0,180,216,.6),
+    0 0 8em rgba(0,140,200,.25),
+    inset 0 0 3em rgba(0,229,255,.2),
+    inset 0 -.8em 1.5em rgba(0,0,0,.25);
+  overflow:hidden}
+/* Reflection streak */
+.visor::before{content:'';position:absolute;top:12%;left:8%;width:35%;height:25%;
+  background:linear-gradient(165deg,rgba(255,255,255,.2),rgba(255,255,255,.05) 60%,transparent);
+  border-radius:50%;transform:rotate(-10deg)}
+/* Bottom edge light */
+.visor::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(0,229,255,.4),transparent)}
+
+/* Holographic visor content — more symbols, varied */
+.holo{position:absolute;
+  text-shadow:0 0 4px rgba(0,229,255,.8);pointer-events:none}
+.holo-1{top:18%;left:15%;font-size:2.2em;color:rgba(255,255,255,.5);animation:holoA 3.5s ease-in-out infinite}
+.holo-2{top:55%;left:55%;font-size:1.4em;color:rgba(0,229,255,.6);animation:holoB 4s ease-in-out infinite}
+.holo-3{top:25%;left:65%;font-size:1.8em;color:rgba(255,255,255,.4);animation:holoC 3s ease-in-out infinite}
+.holo-4{top:65%;left:20%;font-size:1.2em;color:rgba(0,229,255,.45);animation:holoA 5s ease-in-out infinite reverse}
+.holo-5{top:40%;left:40%;font-size:1em;color:rgba(255,255,255,.3);animation:holoB 3.2s ease-in-out infinite reverse}
+@keyframes holoA{0%,100%{transform:translateY(0);opacity:.3}50%{transform:translateY(-.8em);opacity:.85}}
+@keyframes holoB{0%,100%{transform:translateY(0) translateX(0);opacity:.25}50%{transform:translateY(-.6em) translateX(.3em);opacity:.75}}
+@keyframes holoC{0%,100%{transform:translateY(0) scale(1);opacity:.35}50%{transform:translateY(-.5em) scale(1.1);opacity:.8}}
+
+/* Suit body — more panel detail */
+.suit-body{width:13em;height:9.5em;margin:0 auto;
+  background:linear-gradient(175deg,#f2f2f8 0%,#e0e0ea 25%,#d0d0dc 60%,#c5c5d4 100%);
+  border-radius:24% 24% 16% 16%;
+  position:relative;z-index:2;
+  border:.35em solid rgba(0,180,216,.2);
+  box-shadow:0 0 2.5em rgba(0,180,216,.12),inset 0 .5em 1em rgba(0,0,0,.05)}
+/* Shoulder trim */
+.suit-body::before{content:'';position:absolute;top:0;left:0;right:0;height:.5em;
+  background:linear-gradient(90deg,transparent 5%,var(--cyan) 30%,var(--cyan2) 50%,var(--cyan) 70%,transparent 95%);
+  box-shadow:0 0 6px var(--cyan),0 0 12px rgba(0,229,255,.3)}
+/* Center seam */
+.suit-body::after{content:'';position:absolute;top:.8em;bottom:.8em;left:50%;width:.25em;
+  transform:translateX(-50%);
+  background:linear-gradient(180deg,rgba(0,180,216,.08),rgba(0,180,216,.2),rgba(0,180,216,.08))}
+/* Side panel lines */
+.suit-panel-l,.suit-panel-r{position:absolute;top:1.5em;bottom:1.5em;width:.2em;
+  background:rgba(0,180,216,.1)}
+.suit-panel-l{left:18%}.suit-panel-r{right:18%}
+/* Chest logo — Azure triangle, refined */
 .chest-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  font-size:4em;line-height:1;color:var(--cyan);
-  text-shadow:0 0 8px var(--cyan),0 0 16px rgba(0,229,255,.25);font-weight:900}
-.suit-legs{display:flex;justify-content:center;gap:1.8em;margin-top:.6em;position:relative;z-index:2}
-.leg{width:3.2em;height:4.5em;background:linear-gradient(180deg,#d8d8e2,#c0c0cc);
-  border-radius:1.5em 1.5em 1em 1em;border:.25em solid rgba(0,180,216,.18);border-top:none;position:relative}
-.leg::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1em;
-  background:rgba(0,180,216,.15);border-radius:0 0 1em 1em}
+  font-size:4.5em;line-height:1;color:var(--cyan);
+  text-shadow:0 0 10px var(--cyan),0 0 20px rgba(0,229,255,.3),0 0 40px rgba(0,229,255,.15);
+  font-weight:900}
+/* Belt area */
+.suit-belt{position:absolute;bottom:1.2em;left:10%;right:10%;height:1.2em;
+  background:linear-gradient(180deg,#a0a0b0,#888898);
+  border-radius:.4em;box-shadow:0 .2em .3em rgba(0,0,0,.2)}
+.suit-belt::after{content:'';position:absolute;top:.25em;left:50%;transform:translateX(-50%);
+  width:1.5em;height:.7em;background:rgba(0,229,255,.3);border-radius:.2em;
+  box-shadow:0 0 4px rgba(0,229,255,.4)}
 
-/* ─── OBSTACLES ───────────────────────────────────────────────── */
+/* Legs — with knee detail */
+.suit-legs{display:flex;justify-content:center;gap:2em;margin-top:.4em;position:relative;z-index:2}
+.leg{width:3.6em;height:5.5em;
+  background:linear-gradient(180deg,#d5d5e0,#c0c0cc 50%,#b5b5c5);
+  border-radius:1.8em 1.8em 1.2em 1.2em;
+  border:.3em solid rgba(0,180,216,.15);border-top:none;position:relative}
+/* Knee pad */
+.leg::before{content:'';position:absolute;top:35%;left:.2em;right:.2em;height:1.2em;
+  background:linear-gradient(180deg,#c8c8d4,#b0b0c0);border-radius:.8em;
+  border:.15em solid rgba(0,180,216,.1)}
+/* Boot */
+.leg::after{content:'';position:absolute;bottom:0;left:-.1em;right:-.1em;height:1.4em;
+  background:linear-gradient(180deg,#888898,#6a6a7a);
+  border-radius:0 0 1.4em 1.4em;
+  box-shadow:0 .2em .4em rgba(0,0,0,.3)}
+
+/* ─── OBSTACLES ──────────────────────────────────────────── */
 .obs{position:absolute;top:0;width:11em;height:11em;will-change:transform;pointer-events:none}
+/* Inner detail overlays */
+.obs::before{content:'';position:absolute;inset:15%;border-radius:inherit;
+  background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.15),transparent 60%);
+  opacity:.6}
+.obs::after{content:'';position:absolute;inset:30%;
+  background:radial-gradient(circle,rgba(0,0,0,.2),transparent 70%)}
 
-/* ─── HUD ─────────────────────────────────────────────────────── */
+/* ─── HUD ─────────────────────────────────────────────────── */
 #hud{position:absolute;top:0;left:0;right:0;padding:2.5em 4em 1.5em;z-index:100;pointer-events:none}
 .hud-row1{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2em}
-#scoreLbl{font-size:2.2em;color:rgba(0,229,255,.45);letter-spacing:1em;text-transform:uppercase;margin-bottom:.3em}
-#scoreVal{font-size:8.5em;font-weight:900;color:var(--cyan);line-height:1;
-  text-shadow:0 0 3em var(--cyan),0 0 8em rgba(0,229,255,.4);font-variant-numeric:tabular-nums}
-#livesRow{display:flex;gap:1.2em;align-items:center;padding-top:.3em}
-.lheart{font-size:6em;transition:all .35s;filter:drop-shadow(0 0 2px rgba(255,50,100,.8))}
-.lheart.gone{filter:grayscale(1) opacity(.2);transform:scale(.8)}
+#scoreLbl{font-size:2em;color:rgba(0,229,255,.4);letter-spacing:1em;text-transform:uppercase;margin-bottom:.3em}
+#scoreVal{font-size:8em;font-weight:900;color:var(--cyan);line-height:1;
+  text-shadow:0 0 3em var(--cyan),0 0 8em rgba(0,229,255,.35);font-variant-numeric:tabular-nums}
+#livesRow{display:flex;gap:1em;align-items:center;padding-top:.3em}
+.lheart{font-size:5.5em;transition:all .3s;filter:drop-shadow(0 0 2px rgba(255,50,100,.8))}
+.lheart.gone{filter:grayscale(1) opacity(.15);transform:scale(.75)}
 #quizBar{height:2px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
-#quizFill{height:100%;width:100%;border-radius:2px;background:linear-gradient(90deg,var(--cyan),var(--purple));transform-origin:left}
-#quizHint{font-size:2.5em;color:rgba(0,229,255,.5);letter-spacing:.8em;text-transform:uppercase;
+#quizFill{height:100%;width:100%;border-radius:2px;
+  background:linear-gradient(90deg,var(--cyan),var(--purple));transform-origin:left}
+#quizHint{font-size:2.2em;color:rgba(0,229,255,.5);letter-spacing:.8em;text-transform:uppercase;
   text-align:center;margin-top:1.5em;opacity:0;transition:opacity .5s}
-#quizHint.vis{opacity:1;animation:hintAnim 1.2s ease-in-out infinite}
+#quizHint.vis{opacity:1;animation:hintAnim 1s ease-in-out infinite}
 @keyframes hintAnim{0%,100%{opacity:.4}50%{opacity:1}}
-#speedBadge{position:absolute;bottom:4%;right:4%;font-size:3em;font-weight:700;
-  color:rgba(0,229,255,.3);pointer-events:none;letter-spacing:.3em}
+#speedBadge{position:absolute;bottom:4%;right:4%;font-size:2.8em;font-weight:700;
+  color:rgba(0,229,255,.25);pointer-events:none;letter-spacing:.3em}
 
 #hitFlash{position:fixed;inset:0;z-index:4000;background:rgba(255,0,80,.35);opacity:0;pointer-events:none;transition:opacity .08s}
 #gainFlash{position:fixed;inset:0;z-index:4000;background:rgba(0,255,100,.2);opacity:0;pointer-events:none;transition:opacity .08s}
-.part{position:absolute;border-radius:50%;pointer-events:none;animation:partFly .55s ease-out forwards;z-index:200}
-@keyframes partFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(.15)}}
-#comboText{position:absolute;top:28%;left:50%;transform:translateX(-50%);font-size:6em;font-weight:900;
+.part{position:absolute;border-radius:50%;pointer-events:none;animation:partFly .5s ease-out forwards;z-index:200}
+@keyframes partFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(.1)}}
+#comboText{position:absolute;top:28%;left:50%;transform:translateX(-50%);font-size:5.5em;font-weight:900;
   color:var(--yellow);text-shadow:0 0 4em var(--yellow);pointer-events:none;opacity:0;letter-spacing:.5em;z-index:150}
-#tapHint{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);font-size:3em;
-  color:rgba(0,229,255,.3);letter-spacing:.5em;pointer-events:none;text-transform:uppercase;
-  animation:hintFade 3.5s ease-out 1.5s forwards;opacity:0;white-space:nowrap}
-@keyframes hintFade{0%{opacity:0}5%{opacity:1}80%{opacity:.5}100%{opacity:0}}
+#tapHint{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);font-size:2.8em;
+  color:rgba(0,229,255,.25);letter-spacing:.5em;pointer-events:none;text-transform:uppercase;
+  animation:hintFade 3s ease-out 1.5s forwards;opacity:0;white-space:nowrap}
+@keyframes hintFade{0%{opacity:0}5%{opacity:1}80%{opacity:.4}100%{opacity:0}}
 
-/* ─── QUIZ OVERLAY ────────────────────────────────────────────── */
-#quizOverlay{
-  position:fixed;inset:0;z-index:3000;background:rgba(2,6,16,.97);
-  backdrop-filter:blur(8px);display:none;flex-direction:column;align-items:center;
+/* ─── QUIZ OVERLAY ────────────────────────────────────────── */
+#quizOverlay{position:fixed;inset:0;z-index:3000;background:rgba(2,6,16,.97);
+  backdrop-filter:blur(10px);display:none;flex-direction:column;align-items:center;
   justify-content:center;padding:24px;overflow-y:auto;gap:0;font-size:16px;
-  touch-action:pan-y;-webkit-overflow-scrolling:touch;
-}
+  touch-action:pan-y;-webkit-overflow-scrolling:touch}
 #quizOverlay.show{display:flex}
 .qo-top{text-align:center;padding:0 0 16px;flex-shrink:0;max-width:560px;width:100%}
 .qo-badge{display:inline-block;font-size:clamp(10px,2.5vw,14px);letter-spacing:8px;color:var(--cyan);
@@ -276,12 +368,10 @@ html,body{
 #qContinue.show{display:block}
 #qContinue:active{transform:scale(.97);background:rgba(0,229,255,.06)}
 
-/* ─── GAME OVER ───────────────────────────────────────────────── */
-#goScreen{
-  position:fixed;inset:0;z-index:2500;background:rgba(2,6,16,.97);backdrop-filter:blur(6px);
+/* ─── GAME OVER ───────────────────────────────────────────── */
+#goScreen{position:fixed;inset:0;z-index:2500;background:rgba(2,6,16,.97);backdrop-filter:blur(8px);
   display:none;flex-direction:column;align-items:center;justify-content:center;
-  gap:18px;padding:24px;font-size:16px;touch-action:none;
-}
+  gap:18px;padding:24px;font-size:16px;touch-action:none}
 #goScreen.show{display:flex}
 .go-over{font-size:clamp(32px,11vw,56px);font-weight:900;letter-spacing:4px;color:var(--pink);
   text-align:center;text-shadow:0 0 4em var(--pink),0 0 10em rgba(255,26,107,.4);
@@ -298,17 +388,14 @@ html,body{
 .go-btn{padding:14px 48px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));
   color:#fff;border:none;border-radius:14px;font-size:clamp(18px,5.5vw,24px);font-weight:800;
   letter-spacing:2px;cursor:pointer;text-transform:uppercase;
-  box-shadow:0 0 20px rgba(0,229,255,.4);transition:transform .1s;touch-action:none}
+  box-shadow:0 0 24px rgba(0,229,255,.5);transition:transform .1s;touch-action:none}
 .go-btn:active{transform:scale(.97)}
 .go-acc{font-size:clamp(11px,3vw,14px);color:rgba(100,116,139,.6);letter-spacing:2px}
 </style>
 </head>
 <body>
 
-<div id="screenGuard">
-  <div class="sg-icon">📱</div>
-  <div class="sg-text">Rotate your device to portrait or make the window taller to play</div>
-</div>
+<div id="screenGuard"><div class="sg-icon">📱</div><div class="sg-text">Rotate to portrait or make the window taller</div></div>
 
 <div id="loadScreen">
   <div class="ls-logo">AI-901</div>
@@ -319,41 +406,74 @@ html,body{
 <div id="startScreen">
   <div class="ss-badge">Azure AI Certification</div>
   <div class="ss-title">AI-901 Runner</div>
-  <div class="ss-sub">Navigate through asteroid fields. Answer questions. Master Azure AI Fundamentals.</div>
+  <div class="ss-sub">Navigate asteroid fields. Answer questions. Master Azure AI Fundamentals.</div>
   <div class="ss-rules">
-    <div class="ss-rule"><span class="ss-rule-icon">👈👉</span><div>Tap <strong>left / right side</strong> of screen to change lanes</div></div>
-    <div class="ss-rule"><span class="ss-rule-icon">❤️</span><div>Start with <strong>3 lives</strong> — a collision loses 1 life</div></div>
-    <div class="ss-rule"><span class="ss-rule-icon">🧠</span><div>Every <strong>30 seconds</strong> the game pauses for an AI-901 quiz question</div></div>
-    <div class="ss-rule"><span class="ss-rule-icon">✅</span><div>Correct answer = <strong>+1 life</strong> (max 5). Wrong = no penalty</div></div>
-    <div class="ss-rule"><span class="ss-rule-icon">⚡</span><div>Speed <strong>increases over time</strong> — how long can you survive?</div></div>
+    <div class="ss-rule"><span class="ss-rule-icon">👈👉</span><div>Tap <strong>left / right</strong> side to change lanes</div></div>
+    <div class="ss-rule"><span class="ss-rule-icon">❤️</span><div>Start with <strong>3 lives</strong> — collision costs 1</div></div>
+    <div class="ss-rule"><span class="ss-rule-icon">🧠</span><div>Every <strong>20 seconds</strong> — AI-901 quiz break</div></div>
+    <div class="ss-rule"><span class="ss-rule-icon">✅</span><div>Correct = <strong>+1 life</strong> (max 5). Wrong = free</div></div>
+    <div class="ss-rule"><span class="ss-rule-icon">⚡</span><div>Speed <strong>ramps fast</strong> — survive!</div></div>
   </div>
   <button class="ss-btn" id="startBtn">LAUNCH MISSION</button>
-  <div class="ss-controls">Mobile: tap left / right side of screen<br>Desktop: Arrow keys or A / D</div>
+  <div class="ss-controls">Mobile: tap left / right side<br>Desktop: Arrow keys or A / D</div>
 </div>
 
 <div id="gc">
   <div id="starsFar"></div>
   <div id="starsNear"></div>
+  <div id="starsBright"></div>
   <div id="nebula"></div>
+  <div id="dust"></div>
   <div class="lane-line" id="ll1"></div>
   <div class="lane-line" id="ll2"></div>
   <div id="spaceGlow"></div>
+  <div id="vignette"></div>
 
-  <!-- Tap zone visual indicators -->
   <div class="tap-zone tap-zone-l" id="tapL"><div class="tap-zone-icon">‹</div></div>
   <div class="tap-zone tap-zone-r" id="tapR"><div class="tap-zone-icon">›</div></div>
 
   <div id="player">
-    <div class="jp-tank jp-l"></div>
-    <div class="jp-tank jp-r"></div>
-    <div class="jp-flame jp-fl"></div>
-    <div class="jp-flame jp-fr"></div>
+    <div class="jp-assembly">
+      <div class="jp-unit">
+        <div class="jp-connector"></div>
+        <div class="jp-tank">
+          <div class="jp-band jp-band-1"></div>
+          <div class="jp-band jp-band-2"></div>
+          <div class="jp-band jp-band-3"></div>
+        </div>
+        <div class="jp-flame-wrap">
+          <div class="jp-flame jp-flame-outer"></div>
+          <div class="jp-flame jp-flame-mid"></div>
+          <div class="jp-flame jp-flame-core"></div>
+        </div>
+      </div>
+      <div class="jp-unit">
+        <div class="jp-connector"></div>
+        <div class="jp-tank">
+          <div class="jp-band jp-band-1"></div>
+          <div class="jp-band jp-band-2"></div>
+          <div class="jp-band jp-band-3"></div>
+        </div>
+        <div class="jp-flame-wrap">
+          <div class="jp-flame jp-flame-outer"></div>
+          <div class="jp-flame jp-flame-mid"></div>
+          <div class="jp-flame jp-flame-core"></div>
+        </div>
+      </div>
+    </div>
     <div class="helmet"><div class="visor">
       <span class="holo holo-1">◈</span>
       <span class="holo holo-2">01</span>
       <span class="holo holo-3">◇</span>
+      <span class="holo holo-4">∞</span>
+      <span class="holo holo-5">▸</span>
     </div></div>
-    <div class="suit-body"><div class="chest-logo">▲</div></div>
+    <div class="suit-body">
+      <div class="suit-panel-l"></div>
+      <div class="suit-panel-r"></div>
+      <div class="chest-logo">▲</div>
+      <div class="suit-belt"></div>
+    </div>
     <div class="suit-legs"><div class="leg"></div><div class="leg"></div></div>
   </div>
 
@@ -365,7 +485,6 @@ html,body{
     <div id="quizBar"><div id="quizFill"></div></div>
     <div id="quizHint">QUIZ INCOMING</div>
   </div>
-
   <div id="speedBadge"></div>
   <div id="tapHint">TAP LEFT / RIGHT</div>
   <div id="comboText"></div>
@@ -418,10 +537,10 @@ const QS=[
 {dom:"Generative AI & Foundry",q:"What is 'prompt engineering'?",o:["Fine-tuning a model on domain-specific data","Designing and refining text inputs to guide a generative AI toward desired output","Engineering infrastructure to serve models at scale","Converting model outputs into structured data"],a:1,e:"Prompt engineering uses clear instructions, few-shot examples, role assignment, and chain-of-thought to improve LLM output quality — without changing model weights."},
 {dom:"Generative AI & Foundry",q:"What is an AI agent in modern applications?",o:["A human reviewing AI outputs","A pre-trained model fine-tuned on domain data","An AI system that can reason about goals, use tools, and take multi-step autonomous actions","A monitoring dashboard for model performance"],a:2,e:"AI agents extend LLMs beyond single Q&A. They can search the web, call APIs, execute code, and operate autonomously to complete complex tasks."},
 {dom:"Generative AI & Foundry",q:"What does the 'system message' do in Azure OpenAI?",o:["Specifies maximum tokens","Provides the API key","Contains the user's question","Sets the persistent persona, behaviour, and constraints for the assistant"],a:3,e:"The system message instructs the AI's role, tone, and guardrails. It persists across all conversation turns."},
-{dom:"Computer Vision & Document AI",q:"Which task assigns a label to an ENTIRE image (e.g., 'Defective' or 'Non-Defective')?",o:["Object Detection","Semantic Segmentation","Image Classification","Optical Character Recognition"],a:2,e:"Image Classification assigns one label to the whole image. Object Detection locates items with bounding boxes. Segmentation labels each pixel."},
-{dom:"AI Workloads & Responsible AI",q:"Azure AI Content Safety's 'Prompt Shield' detects what type of attack?",o:["Harmful content like violence and hate speech","Grammatical errors in outputs","Prompt injection and jailbreak attacks","Factually incorrect responses"],a:2,e:"Prompt Shield detects direct attacks (jailbreaks trying to override system instructions) and indirect attacks (malicious instructions hidden in retrieved documents)."},
-{dom:"Machine Learning",q:"What is 'data drift' in deployed models?",o:["Training data errors causing poor initial performance","Statistical properties of production data changing over time, causing accuracy to decline","Retraining too frequently, forgetting earlier patterns","Different outputs for the same input due to randomness"],a:1,e:"Data drift: production data distribution shifts from training data. A 2022 model becomes less accurate as customer preferences change. Azure ML provides drift monitoring."},
-{dom:"NLP & Language AI",q:"Which Azure AI Language feature identifies entities like people, locations, and organisations?",o:["Sentiment Analysis","Language Detection","Key Phrase Extraction","Named Entity Recognition (NER)"],a:3,e:"NER identifies real-world entities — Person, Location, Organisation, Date — from unstructured text. Azure AI Language's NER also includes a Healthcare variant."},
+{dom:"Computer Vision & Document AI",q:"Which task assigns a label to an ENTIRE image?",o:["Object Detection","Semantic Segmentation","Image Classification","Optical Character Recognition"],a:2,e:"Image Classification assigns one label to the whole image. Object Detection locates items with bounding boxes. Segmentation labels each pixel."},
+{dom:"AI Workloads & Responsible AI",q:"Azure AI Content Safety's 'Prompt Shield' detects what type of attack?",o:["Harmful content like violence","Grammatical errors in outputs","Prompt injection and jailbreak attacks","Factually incorrect responses"],a:2,e:"Prompt Shield detects direct attacks (jailbreaks) and indirect attacks (malicious instructions hidden in retrieved documents)."},
+{dom:"Machine Learning",q:"What is 'data drift' in deployed models?",o:["Training data errors causing poor initial performance","Statistical properties of production data changing over time, causing accuracy to decline","Retraining too frequently","Different outputs for the same input"],a:1,e:"Data drift: production data distribution shifts from training data. Azure ML provides drift monitoring."},
+{dom:"NLP & Language AI",q:"Which Azure AI Language feature identifies entities like people, locations, and organisations?",o:["Sentiment Analysis","Language Detection","Key Phrase Extraction","Named Entity Recognition (NER)"],a:3,e:"NER identifies real-world entities — Person, Location, Organisation, Date — from unstructured text."},
 {dom:"Generative AI & Foundry",q:"What is Microsoft Copilot?",o:["A programming language for AI on Azure","A physical AI computing device","Microsoft's AI assistant integrated across Microsoft 365, Windows, Bing, and Azure using LLMs","A database service for training data"],a:2,e:"Microsoft Copilot is Microsoft's branded AI assistant powered by LLMs, appearing in Word, Excel, Teams, Outlook, Windows 11, GitHub, and Azure."}
 ];
 
@@ -457,53 +576,57 @@ const $tapL=document.getElementById('tapL');
 const $tapR=document.getElementById('tapR');
 const $sg=document.getElementById('screenGuard');
 
-function updateSizes(){
-  $gc.style.fontSize=($gc.offsetWidth/100)+'px';
-}
+function updateSizes(){$gc.style.fontSize=($gc.offsetWidth/100)+'px'}
 function getLaneCX(i){return $gc.offsetWidth/3*(i+.5)}
-function placePlayer(){
-  const cx=getLaneCX(lane),pw=$player.offsetWidth;
-  $player.style.left=(cx-pw/2)+'px';
-}
+function placePlayer(){const cx=getLaneCX(lane),pw=$player.offsetWidth;$player.style.left=(cx-pw/2)+'px'}
 
 let running=false,paused=false;
 let lane=1,lives=3,score=0,highScore=0;
 let gameTime=0,quizClock=0;
-let speedMul=1,spawnTimer=0,spawnInterval=1200;
+let speedMul=1,spawnTimer=0,spawnInterval=850;
 let invincible=false,lastTS=null,rafId=null;
 let totalQ=0,correctQ=0,usedQ=[];
-const QUIZ_INTERVAL=30000,MAX_LIVES=5,MAX_OBS=12;
-const BASE_SPEED=0.58;   /* was 0.42 — ~38% faster base */
-const BASE_INTERVAL=1200;  /* was 1800 — obstacles spawn much sooner */
-const BASE_SCORE_RATE=18;  /* was 12 — faster score accumulation */
+const QUIZ_INTERVAL=20000,MAX_LIVES=5,MAX_OBS=14;
+const BASE_SPEED=0.82;
+const BASE_INTERVAL=850;
+const BASE_SCORE_RATE=24;
 
-function genStarCSS(n,m){
+/* ─── STAR FIELDS ─────────────────────────────────────────── */
+function genStarCSS(n,m,sz){
   const p=[];
   for(let i=0;i<n;i++){
-    const x=(Math.random()*100).toFixed(1),y=(Math.random()*100).toFixed(1),o=(.15+Math.random()*m).toFixed(2);
-    p.push(`radial-gradient(1px 1px at ${x}% ${y}%,rgba(255,255,255,${o}),transparent)`);
+    const x=(Math.random()*100).toFixed(1),y=(Math.random()*100).toFixed(1),o=(.1+Math.random()*m).toFixed(2);
+    p.push(`radial-gradient(${sz}px ${sz}px at ${x}% ${y}%,rgba(255,255,255,${o}),transparent)`);
   }
   return p.join(',');
 }
 
-const pool=[];
-function mkObs(){
-  const el=document.createElement('div');el.className='obs';el.style.display='none';
-  $gc.appendChild(el);return{el,lane:0,y:0,active:false,hit:false};
+/* ─── AMBIENT DUST PARTICLES ──────────────────────────────── */
+function createDust(){
+  const $d=document.getElementById('dust');
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');p.className='dust-p';
+    const x=Math.random()*100,s=1+Math.random()*2,dur=8+Math.random()*12,del=Math.random()*10;
+    p.style.cssText=`left:${x}%;top:-5px;width:${s}px;height:${s}px;
+      animation-duration:${dur}s;animation-delay:${del}s;
+      opacity:${.05+Math.random()*.15}`;
+    $d.appendChild(p);
+  }
 }
+
+const pool=[];
+function mkObs(){const el=document.createElement('div');el.className='obs';el.style.display='none';$gc.appendChild(el);return{el,lane:0,y:0,active:false,hit:false}}
 function initPool(){for(let i=0;i<MAX_OBS;i++)pool.push(mkObs())}
 function getFree(){return pool.find(o=>!o.active)||null}
-
 function spawnObs(){
   const o=getFree();if(!o)return;
   const t=OT[Math.floor(Math.random()*OT.length)];
   o.lane=Math.floor(Math.random()*3);
-  o.y=-$gc.offsetHeight*.12;
-  o.active=true;o.hit=false;
+  o.y=-$gc.offsetHeight*.13;o.active=true;o.hit=false;
   const cx=getLaneCX(o.lane),ow=o.el.offsetWidth;
   o.el.style.cssText=`display:block;left:${cx-ow/2}px;width:11em;height:11em;top:0;
     background:${t.bg};border:1.5px solid ${t.bd};border-radius:${t.br};
-    box-shadow:0 0 3em ${t.gw},0 0 6em ${t.gw},inset 0 0 2em ${t.gw};
+    box-shadow:0 0 3em ${t.gw},0 0 7em ${t.gw},inset 0 0 2em ${t.gw};
     transform:translateY(${o.y}px);`;
 }
 
@@ -512,11 +635,7 @@ function mvRight(){if(!running||paused||lane>=2)return;lane++;placePlayer()}
 
 function drawLives(){
   $livesRow.innerHTML='';
-  for(let i=0;i<MAX_LIVES;i++){
-    const s=document.createElement('span');
-    s.className='lheart'+(i>=lives?' gone':'');
-    s.textContent='❤️';$livesRow.appendChild(s);
-  }
+  for(let i=0;i<MAX_LIVES;i++){const s=document.createElement('span');s.className='lheart'+(i>=lives?' gone':'');s.textContent='❤️';$livesRow.appendChild(s)}
 }
 
 function checkColl(){
@@ -526,8 +645,7 @@ function checkColl(){
     if(!o.active||o.hit)continue;
     const r=o.el.getBoundingClientRect();
     if(r.left<pr.right&&r.right>pr.left&&r.top<pr.bottom&&r.bottom>pr.top){
-      o.hit=true;o.active=false;o.el.style.display='none';
-      onHit();return;
+      o.hit=true;o.active=false;o.el.style.display='none';onHit();return;
     }
   }
 }
@@ -544,124 +662,83 @@ let shakeTO=null;
 function shakeGame(){
   const seq=['translate(5px,-3px)','translate(-5px,3px)','translate(3px,5px)','translate(-3px,-5px)','translate(0,0)'];
   let i=0;clearTimeout(shakeTO);
-  const n=()=>{if(i>=seq.length){$gc.style.transform='translateX(-50%)';return}
-    $gc.style.transform=`translateX(-50%) ${seq[i++]}`;shakeTO=setTimeout(n,60)};n();
+  const n=()=>{if(i>=seq.length){$gc.style.transform='translateX(-50%)';return}$gc.style.transform=`translateX(-50%) ${seq[i++]}`;shakeTO=setTimeout(n,60)};n();
 }
 function flashRed(){$hitFlash.style.opacity='1';setTimeout(()=>$hitFlash.style.opacity='0',140)}
 function flashGreen(){$gainFlash.style.opacity='1';setTimeout(()=>$gainFlash.style.opacity='0',400)}
 function spawnParticles(cx,cy,color){
-  for(let i=0;i<10;i++){
+  for(let i=0;i<12;i++){
     const p=document.createElement('div');p.className='part';
-    const ang=(i/10)*Math.PI*2,d=4+Math.random()*7,s=1.5+Math.random()*1.5;
+    const ang=(i/12)*Math.PI*2,d=4+Math.random()*8,s=1.2+Math.random()*1.8;
     p.style.cssText=`left:${cx}px;top:${cy}px;width:${s}em;height:${s}em;background:${color};box-shadow:0 0 ${s}em ${color};--tx:${(Math.cos(ang)*d).toFixed(1)}em;--ty:${(Math.sin(ang)*d).toFixed(1)}em;`;
-    $gc.appendChild(p);setTimeout(()=>p.remove(),600);
+    $gc.appendChild(p);setTimeout(()=>p.remove(),550);
   }
 }
-function showCombo(t,c){$comboText.textContent=t;$comboText.style.color=c;$comboText.style.textShadow=`0 0 3em ${c}`;$comboText.style.opacity='1';setTimeout(()=>$comboText.style.opacity='0',900)}
+function showCombo(t,c){$comboText.textContent=t;$comboText.style.color=c;$comboText.style.textShadow=`0 0 4em ${c}`;$comboText.style.opacity='1';setTimeout(()=>$comboText.style.opacity='0',900)}
 
-/* ─── TAP ZONE FLASH FEEDBACK ────────────────────────────────── */
 let tapFlashTO=null;
-function flashTap(side){
-  const el=side==='l'?$tapL:$tapR;
-  el.classList.add('flash');
-  clearTimeout(tapFlashTO);
-  tapFlashTO=setTimeout(()=>el.classList.remove('flash'),120);
-}
+function flashTap(side){const el=side==='l'?$tapL:$tapR;el.classList.add('flash');clearTimeout(tapFlashTO);tapFlashTO=setTimeout(()=>el.classList.remove('flash'),100)}
 
-/* ─── QUIZ ────────────────────────────────────────────────────── */
-function pickQ(){
-  if(usedQ.length>=QS.length)usedQ=[];
-  const a=QS.map((_,i)=>i).filter(i=>!usedQ.includes(i));
-  const idx=a[Math.floor(Math.random()*a.length)];usedQ.push(idx);return{...QS[idx],_i:idx};
-}
+/* ─── QUIZ ────────────────────────────────────────────────── */
+function pickQ(){if(usedQ.length>=QS.length)usedQ=[];const a=QS.map((_,i)=>i).filter(i=>!usedQ.includes(i));const idx=a[Math.floor(Math.random()*a.length)];usedQ.push(idx);return{...QS[idx]}}
 function showQuiz(){
-  paused=true;totalQ++;
-  const q=pickQ();
+  paused=true;totalQ++;const q=pickQ();
   $qDomain.textContent=q.dom;$qText.textContent=q.q;
-  $qOpts.innerHTML='';$qExpl.classList.remove('show');$qExplTxt.textContent='';
-  $qCont.classList.remove('show');$qOver.classList.add('show');
-  ['A','B','C','D'].forEach((l,i)=>{
-    const d=document.createElement('div');d.className='qopt';
-    d.innerHTML=`<div class="qltr">${l}</div><div>${q.o[i]}</div>`;
-    d.addEventListener('click',()=>{if(d.classList.contains('dis'))return;onQuizAnswer(i,q.a,q.e)});
-    $qOpts.appendChild(d);
-  });
+  $qOpts.innerHTML='';$qExpl.classList.remove('show');$qExplTxt.textContent='';$qCont.classList.remove('show');$qOver.classList.add('show');
+  ['A','B','C','D'].forEach((l,i)=>{const d=document.createElement('div');d.className='qopt';d.innerHTML=`<div class="qltr">${l}</div><div>${q.o[i]}</div>`;d.addEventListener('click',()=>{if(d.classList.contains('dis'))return;onQuizAnswer(i,q.a,q.e)});$qOpts.appendChild(d)});
 }
 function onQuizAnswer(sel,correct,expl){
   const opts=$qOpts.querySelectorAll('.qopt');opts.forEach(o=>o.classList.add('dis'));
-  if(sel===correct){
-    opts[sel].classList.add('hit-ok');correctQ++;
-    if(lives<MAX_LIVES){lives++;drawLives();flashGreen();showCombo('+1 LIFE','var(--green)');
-      const gr=$gc.getBoundingClientRect();spawnParticles(gr.width/2,gr.height/2,'#22c55e')}
+  if(sel===correct){opts[sel].classList.add('hit-ok');correctQ++;
+    if(lives<MAX_LIVES){lives++;drawLives();flashGreen();showCombo('+1 LIFE','var(--green)');const gr=$gc.getBoundingClientRect();spawnParticles(gr.width/2,gr.height/2,'#22c55e')}
     else showCombo('PERFECT','var(--yellow)');
   }else{opts[sel].classList.add('hit-bad');opts[correct].classList.add('reveal-ok');showCombo('KEEP STUDYING','#f87171')}
   $qExplTxt.textContent=expl;$qExpl.classList.add('show');$qCont.classList.add('show');
 }
- $qCont.addEventListener('click',()=>{
-  $qOver.classList.remove('show');paused=false;quizClock=0;
-  $qFill.style.width='100%';$qHint.classList.remove('vis');
-  invincible=true;$player.classList.add('inv');
-  setTimeout(()=>{invincible=false;$player.classList.remove('inv')},1000);
-});
+ $qCont.addEventListener('click',()=>{$qOver.classList.remove('show');paused=false;quizClock=0;$qFill.style.width='100%';$qHint.classList.remove('vis');invincible=true;$player.classList.add('inv');setTimeout(()=>{invincible=false;$player.classList.remove('inv')},1000)});
 
-/* ─── GAME LOOP ──────────────────────────────────────────────── */
+/* ─── GAME LOOP ──────────────────────────────────────────── */
 function loop(ts){
   if(!running)return;
   if(!lastTS)lastTS=ts;
   const dt=Math.min((ts-lastTS)/1000,.05);lastTS=ts;
   if(!paused){
     gameTime+=dt;quizClock+=dt*1000;
-    /* Speed ramp: +10% every 8s (was +8% every 10s) */
-    speedMul=Math.min(1+Math.floor(gameTime/8)*.10,3.2);
-    spawnInterval=Math.max(450,BASE_INTERVAL/speedMul);
+    speedMul=Math.min(1+Math.floor(gameTime/6)*.12,3.5);
+    spawnInterval=Math.max(380,BASE_INTERVAL/speedMul);
     score+=dt*BASE_SCORE_RATE*speedMul;
     $scoreVal.textContent=Math.floor(score).toLocaleString();
     $speedBadge.textContent=`×${speedMul.toFixed(1)}`;
-
     spawnTimer+=dt*1000;
-    if(spawnTimer>=spawnInterval){
-      spawnTimer=0;spawnObs();
-      /* Double spawn chance higher and earlier */
-      if(speedMul>1.3&&Math.random()<.3)setTimeout(spawnObs,150);
+    if(spawnTimer>=spawnInterval){spawnTimer=0;spawnObs();
+      if(speedMul>1.2&&Math.random()<.35)setTimeout(spawnObs,120);
+      if(speedMul>2&&Math.random()<.2)setTimeout(spawnObs,240);
     }
-
-    const gcH=$gc.offsetHeight;
-    const spd=gcH*BASE_SPEED*speedMul;
-    for(const o of pool){
-      if(!o.active)continue;
-      o.y+=spd*dt;o.el.style.transform=`translateY(${o.y}px)`;
-      if(o.y>gcH+60){o.active=false;o.el.style.display='none'}
-    }
+    const gcH=$gc.offsetHeight,spd=gcH*BASE_SPEED*speedMul;
+    for(const o of pool){if(!o.active)continue;o.y+=spd*dt;o.el.style.transform=`translateY(${o.y}px)`;if(o.y>gcH+60){o.active=false;o.el.style.display='none'}}
     checkColl();
-
-    const ratio=1-quizClock/QUIZ_INTERVAL;
-    $qFill.style.width=Math.max(0,ratio*100)+'%';
-    if(quizClock>QUIZ_INTERVAL-6000)$qHint.classList.add('vis');
+    const ratio=1-quizClock/QUIZ_INTERVAL;$qFill.style.width=Math.max(0,ratio*100)+'%';
+    if(quizClock>QUIZ_INTERVAL-5000)$qHint.classList.add('vis');
     if(quizClock>=QUIZ_INTERVAL)showQuiz();
   }
   rafId=requestAnimationFrame(loop);
 }
 
 function startGame(){
-  updateSizes();lane=1;lives=3;score=0;gameTime=0;
-  quizClock=0;speedMul=1;spawnTimer=0;
-  invincible=false;lastTS=null;usedQ=[];
-  totalQ=0;correctQ=0;
+  updateSizes();lane=1;lives=3;score=0;gameTime=0;quizClock=0;speedMul=1;spawnTimer=0;
+  invincible=false;lastTS=null;usedQ=[];totalQ=0;correctQ=0;
   for(const o of pool){o.active=false;o.hit=false;o.el.style.display='none'}
-  drawLives();$scoreVal.textContent='0';
-  $qFill.style.width='100%';$qHint.classList.remove('vis');
+  drawLives();$scoreVal.textContent='0';$qFill.style.width='100%';$qHint.classList.remove('vis');
   $player.classList.remove('inv');$comboText.style.opacity='0';
   $startSc.style.opacity='0';setTimeout(()=>$startSc.style.display='none',400);
   $goScreen.classList.remove('show');$qOver.classList.remove('show');
   placePlayer();running=true;paused=false;
   invincible=true;$player.classList.add('inv');
   setTimeout(()=>{invincible=false;$player.classList.remove('inv')},1200);
-  if(rafId)cancelAnimationFrame(rafId);
-  rafId=requestAnimationFrame(loop);
+  if(rafId)cancelAnimationFrame(rafId);rafId=requestAnimationFrame(loop);
 }
 function endGame(){
-  running=false;paused=false;
-  if(rafId){cancelAnimationFrame(rafId);rafId=null}
+  running=false;paused=false;if(rafId){cancelAnimationFrame(rafId);rafId=null}
   const fs=Math.floor(score);if(fs>highScore)highScore=fs;
   document.getElementById('goScore').textContent=fs.toLocaleString();
   document.getElementById('goCorrect').textContent=correctQ;
@@ -673,47 +750,33 @@ function endGame(){
   setTimeout(()=>$goScreen.classList.add('show'),300);
 }
 
-/* ════════════════════════════════════════════════════════════════
-   CONTROLS — tap left/right half for mobile, keys for desktop
-════════════════════════════════════════════════════════════════ */
+/* ─── CONTROLS ────────────────────────────────────────────── */
  $gc.addEventListener('touchstart',e=>{
-  /* Find which touch landed inside the game container */
   for(let i=0;i<e.changedTouches.length;i++){
-    const t=e.changedTouches[i];
-    const rect=$gc.getBoundingClientRect();
-    const x=t.clientX-rect.left;
-    if(x<rect.width/2){mvLeft();flashTap('l')}
-    else{mvRight();flashTap('r')}
+    const t=e.changedTouches[i],rect=$gc.getBoundingClientRect(),x=t.clientX-rect.left;
+    if(x<rect.width/2){mvLeft();flashTap('l')}else{mvRight();flashTap('r')}
   }
 },{passive:true});
-
 document.addEventListener('keydown',e=>{
   if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')mvLeft();
   if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')mvRight();
 });
-
 document.getElementById('startBtn').addEventListener('click',startGame);
 document.getElementById('retryBtn').addEventListener('click',startGame);
 
-/* ─── SCREEN GUARD ───────────────────────────────────────────── */
 function checkScreen(){$sg.classList.toggle('show',window.innerHeight<420)}
 window.addEventListener('resize',checkScreen);
 window.addEventListener('orientationchange',()=>setTimeout(checkScreen,200));
-
-/* ─── RESIZE ──────────────────────────────────────────────────── */
-window.addEventListener('resize',()=>{
-  checkScreen();updateSizes();
-  if(running){
-    placePlayer();
-    for(const o of pool){if(o.active){o.el.style.left=(getLaneCX(o.lane)-o.el.offsetWidth/2)+'px'}}
-  }
+window.addEventListener('resize',()=>{checkScreen();updateSizes();
+  if(running){placePlayer();for(const o of pool){if(o.active)o.el.style.left=(getLaneCX(o.lane)-o.el.offsetWidth/2)+'px'}}
 });
 
-/* ─── INIT ────────────────────────────────────────────────────── */
+/* ─── INIT ────────────────────────────────────────────────── */
 window.addEventListener('load',()=>{
-  document.getElementById('starsFar').style.backgroundImage=genStarCSS(160,.5);
-  document.getElementById('starsNear').style.backgroundImage=genStarCSS(80,.9);
-  initPool();updateSizes();checkScreen();
+  document.getElementById('starsFar').style.backgroundImage=genStarCSS(120,.4,1);
+  document.getElementById('starsNear').style.backgroundImage=genStarCSS(60,.8,1.5);
+  document.getElementById('starsBright').style.backgroundImage=genStarCSS(15,.9,2);
+  createDust();initPool();updateSizes();checkScreen();
   setTimeout(()=>{$loadSc.classList.add('out');setTimeout(()=>$loadSc.style.display='none',700)},950);
 });
 </script>
